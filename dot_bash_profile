@@ -1,0 +1,11 @@
+# ~/.bash_profile — sources ~/.bash.d/*.sh (chezmoi-managed) and per-host files.
+
+# If not running interactively, don't do anything
+[[ $- != *i* ]] && return
+
+# Folder-based loading: aliases.sh, env.sh, functions.sh are managed by
+# chezmoi; secrets.sh and local.sh are per-host and never tracked — create
+# them if you need them, they are sourced automatically when present.
+for f in "$HOME"/.bash.d/*.sh; do
+	[ -r "$f" ] && source "$f"
+done

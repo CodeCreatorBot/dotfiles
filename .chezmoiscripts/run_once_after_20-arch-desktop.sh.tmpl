@@ -1,0 +1,192 @@
+#!/usr/bin/env bash
+# Arch desktop layer — run once, AFTER dotfiles (run_once_after_).
+#
+# Switch-gated: packages come from .chezmoidata/packages.arch.yaml grouped
+# by switch name; switch VALUES come from chezmoi.toml [data]. Because the
+# template renders each enabled switch into the script, toggling a switch
+# in chezmoi.toml changes the rendered content → new checksum → this
+# script re-runs (and re-prompts). env={{ .env }}
+{{- if or (ne (.env | default "dev") "desktop") (ne .chezmoi.os "linux") }}
+echo "Skip: env=desktop + Arch only"
+exit 0
+{{- else }}
+set -eu
+
+# Self-gate: chezmoi runs every run_ script on every OS.
+[ -f /etc/arch-release ] || { echo "Skip: not Arch"; exit 0; }
+
+# ── collect packages (switch-gated) ─────────────────────────────────────
+
+PKG_PACMAN=()
+PKG_AUR=()
+FLATPAKS=()
+SERVICES_ENABLE=()
+GROUPS_ADD=()
+
+{{ if .hypr }}
+PKG_PACMAN+=({{ range .arch.desktop.hypr.pacman }}"{{ . }}" {{ end }})
+{{ end }}
+{{ if .waybar }}
+PKG_PACMAN+=({{ range .arch.desktop.waybar.pacman }}"{{ . }}" {{ end }})
+{{ end }}
+{{ if .dunst }}
+PKG_PACMAN+=({{ range .arch.desktop.dunst.pacman }}"{{ . }}" {{ end }})
+{{ end }}
+{{ if .matugen }}
+PKG_PACMAN+=({{ range .arch.desktop.matugen.pacman }}"{{ . }}" {{ end }})
+{{ end }}
+{{ if .iwd }}
+PKG_PACMAN+=({{ range .arch.desktop.iwd.pacman }}"{{ . }}" {{ end }})
+SERVICES_ENABLE+=({{ range .arch.desktop.iwd.services }}"{{ . }}" {{ end }})
+{{ end }}
+{{ if .satty }}
+PKG_PACMAN+=({{ range .arch.desktop.satty.pacman }}"{{ . }}" {{ end }})
+{{ end }}
+{{ if .chromium }}
+PKG_PACMAN+=({{ range .arch.desktop.chromium.pacman }}"{{ . }}" {{ end }})
+{{ end }}
+{{ if .obsidian }}
+PKG_PACMAN+=({{ range .arch.desktop.obsidian.pacman }}"{{ . }}" {{ end }})
+{{ end }}
+{{ if .docker }}
+PKG_PACMAN+=({{ range .arch.desktop.docker.pacman }}"{{ . }}" {{ end }})
+SERVICES_ENABLE+=({{ range .arch.desktop.docker.services }}"{{ . }}" {{ end }})
+GROUPS_ADD+=({{ range .arch.desktop.docker.groups }}"{{ . }}" {{ end }})
+{{ end }}
+{{ if .bluetooth }}
+PKG_PACMAN+=({{ range .arch.desktop.bluetooth.pacman }}"{{ . }}" {{ end }})
+SERVICES_ENABLE+=({{ range .arch.desktop.bluetooth.services }}"{{ . }}" {{ end }})
+{{ end }}
+{{ if .walker }}
+PKG_AUR+=({{ range .arch.desktop.walker.aur }}"{{ . }}" {{ end }})
+{{ end }}
+{{ if .elephant }}
+PKG_AUR+=({{ range .arch.desktop.elephant.aur }}"{{ . }}" {{ end }})
+{{ end }}
+{{ if .onedrive }}
+PKG_AUR+=({{ range .arch.desktop.onedrive.aur }}"{{ . }}" {{ end }})
+{{ end }}
+{{ if .flatpak }}
+FLATPAKS=({{ range .arch.desktop.flatpak }}"{{ . }}" {{ end }})
+{{ end }}
+
+# AUR extras (desktop, always)
+PKG_AUR+=({{ range .arch.desktop.aurExtras }}"{{ . }}" {{ end }})
+
+# base-devel is needed to build AUR packages
+if [ ${#PKG_AUR[@]} -gt 0 ]; then
+	PKG_PACMAN+=(base-devel)
+fi
+
+# ── confirmation ────────────────────────────────────────────────────────
+
+echo
+echo "==> Arch desktop packages (env={{ .env }})"
+echo
+if [ ${#PKG_PACMAN[@]} -gt 0 ]; then
+	echo "  pacman:  ${PKG_PACMAN[*]}"
+fi
+if [ ${#PKG_AUR[@]} -gt 0 ]; then
+	echo "  aur:     ${PKG_AUR[*]}"
+fi
+if [ ${#FLATPAKS[@]} -gt 0 ]; then
+	echo "  flatpak: ${FLATPAKS[*]}"
+fi
+if [ ${#SERVICES_ENABLE[@]} -gt 0 ]; then
+	echo "  services (enable --now): ${SERVICES_ENABLE[*]}"
+fi
+if [ ${#GROUPS_ADD[@]} -gt 0 ]; then
+	echo "  groups (add $USER):      ${GROUPS_ADD[*]}"
+fi
+if ! grep -q '^\[multilib\]' /etc/pacman.conf 2>/dev/null; then
+	echo "  multilib: enable in /etc/pacman.conf"
+fi
+{{ if .iwd }}
+echo "  iwd: deploy ~/.config/iwd/main.conf → /etc/iwd/main.conf"
+{{ end }}
+echo
+read -rp "Install the above? [y/N] " yn
+case "$yn" in
+	[Yy]*) ;;
+	*)
+		echo "Aborted."
+		exit 0
+		;;
+esac
+
+# ── multilib ────────────────────────────────────────────────────────────
+
+if ! grep -q '^\[multilib\]' /etc/pacman.conf 2>/dev/null; then
+	echo "==> enabling multilib"
+	sudo tee -a /etc/pacman.conf >/dev/null <<'EOF'
+
+[multilib]
+Include = /etc/pacman.d/mirrorlist
+EOF
+else
+	echo "multilib already enabled"
+fi
+
+# ── pacman ──────────────────────────────────────────────────────────────
+
+if [ ${#PKG_PACMAN[@]} -gt 0 ]; then
+	sudo pacman -Sy --needed --noconfirm "${PKG_PACMAN[@]}"
+fi
+
+# ── AUR (bootstrap yay if needed) ───────────────────────────────────────
+
+if [ ${#PKG_AUR[@]} -gt 0 ]; then
+	if ! command -v yay >/dev/null 2>&1; then
+		echo "==> yay: not found — bootstrapping"
+		tmp="$(mktemp -d)"
+		git clone https://aur.archlinux.org/yay-bin.git "$tmp/yay-bin"
+		sh -c "cd '$tmp/yay-bin' && makepkg -si --noconfirm"
+		rm -rf "$tmp"
+	fi
+	echo "==> yay: ${PKG_AUR[*]}"
+	yay -S --needed --noconfirm "${PKG_AUR[@]}"
+fi
+
+# ── flatpak ─────────────────────────────────────────────────────────────
+
+if [ ${#FLATPAKS[@]} -gt 0 ]; then
+	if ! command -v flatpak >/dev/null 2>&1; then
+		echo "==> installing flatpak"
+		sudo pacman -Sy --needed --noconfirm flatpak
+	fi
+	if ! flatpak remote-list 2>/dev/null | grep -q flathub; then
+		echo "==> adding flathub remote"
+		flatpak remote-add --if-not-exists \
+			flathub https://flathub.org/repo/flathub.flatpakrepo
+	fi
+	echo "==> flatpak: ${FLATPAKS[*]}"
+	flatpak install -y flathub "${FLATPAKS[@]}"
+fi
+
+# ── services + groups ───────────────────────────────────────────────────
+
+for svc in "${SERVICES_ENABLE[@]}"; do
+	echo "==> service: enable --now $svc"
+	sudo systemctl enable --now "$svc"
+done
+for grp in "${GROUPS_ADD[@]}"; do
+	if id -nG "$USER" 2>/dev/null | grep -qw "$grp"; then
+		echo "user already in group $grp"
+	else
+		echo "==> group: add $USER to $grp"
+		sudo usermod -aG "$grp" "$USER"
+	fi
+done
+
+{{ if .iwd }}
+# iwd config → /etc (replaces the old run_onchange script)
+if [ -f "$HOME/.config/iwd/main.conf" ]; then
+	echo "==> iwd: deploy /etc/iwd/main.conf"
+	sudo install -D "$HOME/.config/iwd/main.conf" /etc/iwd/main.conf
+	sudo systemctl restart iwd
+fi
+{{ end }}
+
+echo
+echo "Done."
+{{- end }}

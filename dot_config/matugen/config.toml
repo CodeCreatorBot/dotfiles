@@ -1,0 +1,16 @@
+[config]
+
+[templates.waybar]
+input_path = './templates/css_template.conf'
+output_path = '~/.config/waybar/colors.css'
+post_hook = "pkill -SIGUSR2 waybar"
+
+[templates.ghostty]
+input_path = './templates/ghostty'
+output_path = '~/.config/ghostty/themes/Matugen'
+post_hook = 'pkill -SIGUSR2 ghostty'
+
+# [templates.tmux]
+# input_path = './templates/tmux-colors.conf'
+# output_path = '~/.config/tmux/generated.conf'
+# post_hook = 'tmux source-file ~/.config/tmux/generated.conf'

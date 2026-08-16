@@ -1,0 +1,4 @@
+worktree-path = "{{ repo_path }}/../{{ branch | sanitize }}"
+
+[commit.generation]
+command = "pi -p --no-session --thinking off --no-tools --no-skills --no-extensions --no-prompt-templates --no-context-files --system-prompt='' --model gpt-5-mini"

@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# Windows — winget work tooling (run once, before dotfiles).
+# Package data: .chezmoidata/packages.windows.yaml.
+# Gate: env = work-dev AND native Windows (WSL is Linux).
+{{- if or (ne (.env | default "dev") "work-dev") (ne .chezmoi.os "windows") }}
+echo "Skip: env=work-dev + Windows only"
+exit 0
+{{- else }}
+set -eu
+
+# ── package list ────────────────────────────────────────────────────────
+
+PKG_WINGET=({{ range .windows.winget }}"{{ . }}" {{ end }})
+
+# ── confirmation ────────────────────────────────────────────────────────
+
+echo
+echo "==> Windows work tooling (env={{ .env }})"
+echo
+echo "  winget: ${PKG_WINGET[*]}"
+echo "  posh-git: initialised in the PowerShell profile (no install needed)"
+echo
+read -rp "Install the above? [y/N] " yn
+case "$yn" in
+	[Yy]*) ;;
+	*)
+		echo "Aborted."
+		exit 0
+		;;
+esac
+
+# ── winget ──────────────────────────────────────────────────────────────
+
+for pkg in "${PKG_WINGET[@]}"; do
+	echo "==> winget: $pkg"
+	powershell.exe -NoProfile -Command \
+		"winget install -e --id $pkg --accept-source-agreements --accept-package-agreements"
+done
+
+echo
+echo "Done."
+{{- end }}

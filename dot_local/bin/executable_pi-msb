@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+home_dir="${HOME:?HOME is required}"
+runtime_dir="$home_dir/.local/share/pi-microsandbox"
+cli="$runtime_dir/dist/cli.js"
+
+if [[ ! -f "$cli" ]]; then
+  echo "pi-msb CLI not found at: $cli" >&2
+  echo "Bootstrap pi-msb with: (cd \"$runtime_dir\" && npm install && npm run build)" >&2
+  echo "On first launch, pi-msb will create the default baseline snapshot automatically." >&2
+  exit 1
+fi
+
+exec node "$cli" "$@"

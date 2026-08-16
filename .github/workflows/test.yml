@@ -1,0 +1,34 @@
+name: Test Bootstrap
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  test:
+    name: Test ${{ matrix.distro }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        distro: [ubuntu, fedora, arch]
+        include:
+          - distro: ubuntu
+            image: ubuntu:latest
+          - distro: fedora
+            image: fedora:latest
+          - distro: arch
+            image: archlinux:latest
+      fail-fast: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Chezmoi dev bootstrap test
+        run: |
+          docker run --rm \
+            -v "$PWD:/repo:ro" \
+            "${{ matrix.image }}" \
+            bash /repo/tests/test-bootstrap.sh

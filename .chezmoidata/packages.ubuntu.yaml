@@ -1,0 +1,14 @@
+# Ubuntu packages — consumed by run_once_before_10-ubuntu.sh.tmpl.
+ubuntu:
+  apt:
+    - neovim
+    - eza
+    - zoxide
+    - fzf
+    - ripgrep
+    - fd-find
+    - bat
+    - lazygit
+    - ghostty
+    - docker.io
+    - docker-compose

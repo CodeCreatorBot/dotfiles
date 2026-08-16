@@ -1,0 +1,193 @@
+{
+  // OpenCode config — shared defaults. Provider and model are host-specific;
+  // configure them per machine (never managed by chezmoi).
+  "$schema": "https://opencode.ai/config.json",
+  "autoupdate": false,
+  // plugin: "opencode-gemini-auth",  // uncomment if using Google provider
+
+  "permission": {
+    "*": "ask",
+    "write": "allow",
+    "edit": "allow",
+    "list": "allow",
+    "glob": "allow",
+    "grep": "allow",
+    "lsp": "allow",
+    "webfetch": "allow",
+    "todowrite": "allow",
+    "gh_grep_*": "allow",
+    "exa_*": "allow",
+    "read": {
+      "*": "allow",
+      "*.env": "deny",
+      "*.env.*": "deny",
+      "*.env.example": "allow",
+      "*.pem": "deny",
+      "*.key": "deny",
+      "*.p12": "deny",
+      "*.pfx": "deny",
+      "**/.ssh/**": "deny",
+      "**/.aws/**": "deny",
+      "**/.gnupg/**": "deny",
+      "**/.kube/**": "deny",
+      "**/.netrc": "deny",
+      "**/.npmrc": "deny",
+      "**/.pypirc": "deny",
+      "**/*id_rsa*": "deny",
+      "**/*id_ed25519*": "deny",
+      "**/*.kdbx": "deny"
+    },
+    "bash": {
+      "*": "ask",
+      "ls": "allow",
+      "git status*": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "git show*": "allow",
+      "git branch*": "allow",
+      "git rev-parse*": "allow",
+      "git fetch*": "allow",
+      "rg *": "allow",
+      "grep *": "allow",
+      "git push *": "ask",
+      "git push* main*": "deny",
+      "git push* master*": "deny",
+      "git push* dev*": "deny",
+      "sudo *": "deny",
+      "rm -rf /": "deny",
+      "rm -rf /*": "deny",
+      "mkfs*": "deny",
+      "shutdown*": "deny",
+      "reboot*": "deny"
+    }
+  },
+
+  "mcp": {
+    "gh_grep": {
+      "type": "remote",
+      "url": "https://mcp.grep.app",
+      "enabled": true
+    },
+    "exa": {
+      "type": "remote",
+      "url": "https://mcp.exa.ai/mcp",
+      "enabled": true
+    }
+  },
+
+  "tools": {
+    "playwright*": false
+  },
+
+  "agent": {
+    "research": {
+      "description": "Online-only research subagent with citations and confidence.",
+      "mode": "subagent",
+      "permission": {
+        "*": "deny",
+        "question": "allow",
+        "open-websearch_*": "allow",
+        "webfetch": "allow",
+        "gh_grep": "allow",
+        "context_*": "allow",
+        "codesearch": "allow",
+        "websearch": "deny",
+        "read": "deny",
+        "glob": "deny",
+        "grep": "deny",
+        "list": "deny",
+        "lsp": "deny",
+        "edit": "deny",
+        "write": "deny",
+        "bash": "deny",
+        "task": "deny",
+        "skill": "deny",
+        "todowrite": "deny",
+        "external_directory": "deny",
+        "doom_loop": "ask"
+      },
+      "prompt": "You are the research subagent. Use only online research tools and never inspect local files or codebase content. For programming topics, prioritize official vendor or package documentation first, then use reputable secondary sources only when needed. If sources conflict, prefer the newest official source and briefly note the conflict. Respond with: (1) a brief direct answer, (2) citations as URLs, and (3) confidence as High, Medium, or Low with a one-line reason. If official docs are unavailable, say so explicitly and lower confidence."
+    },
+    "playwright-test-generator": {
+      "description": "Use this agent when you need to create automated browser tests using Playwright",
+      "mode": "subagent",
+      "prompt": "{file:prompts/playwright-test-generator.md}",
+      "permission": {
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "read": "allow",
+        "playwright-test*browser_click": "allow",
+        "playwright-test*browser_drag": "allow",
+        "playwright-test*browser_evaluate": "allow",
+        "playwright-test*browser_file_upload": "allow",
+        "playwright-test*browser_handle_dialog": "allow",
+        "playwright-test*browser_hover": "allow",
+        "playwright-test*browser_navigate": "allow",
+        "playwright-test*browser_press_key": "allow",
+        "playwright-test*browser_select_option": "allow",
+        "playwright-test*browser_snapshot": "allow",
+        "playwright-test*browser_type": "allow",
+        "playwright-test*browser_verify_element_visible": "allow",
+        "playwright-test*browser_verify_list_visible": "allow",
+        "playwright-test*browser_verify_text_visible": "allow",
+        "playwright-test*browser_verify_value": "allow",
+        "playwright-test*browser_wait_for": "allow",
+        "playwright-test*generator_read_log": "allow",
+        "playwright-test*generator_setup_page": "allow",
+        "playwright-test*generator_write_test": "allow"
+      }
+    },
+    "playwright-test-healer": {
+      "description": "Use this agent when you need to debug and fix failing Playwright tests",
+      "mode": "subagent",
+      "prompt": "{file:prompts/playwright-test-healer.md}",
+      "permission": {
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "read": "allow",
+        "write": "allow",
+        "edit": "allow",
+        "playwright-test*browser_console_messages": "allow",
+        "playwright-test*browser_evaluate": "allow",
+        "playwright-test*browser_generate_locator": "allow",
+        "playwright-test*browser_network_requests": "allow",
+        "playwright-test*browser_snapshot": "allow",
+        "playwright-test*test_debug": "allow",
+        "playwright-test*test_list": "allow",
+        "playwright-test*test_run": "allow"
+      }
+    },
+    "playwright-test-planner": {
+      "description": "Use this agent when you need to create comprehensive test plan for a web application or website",
+      "mode": "subagent",
+      "prompt": "{file:prompts/playwright-test-planner.md}",
+      "permission": {
+        "list": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "read": "allow",
+        "write": "allow",
+        "playwright-test*browser_click": "allow",
+        "playwright-test*browser_close": "allow",
+        "playwright-test*browser_console_messages": "allow",
+        "playwright-test*browser_drag": "allow",
+        "playwright-test*browser_evaluate": "allow",
+        "playwright-test*browser_file_upload": "allow",
+        "playwright-test*browser_handle_dialog": "allow",
+        "playwright-test*browser_hover": "allow",
+        "playwright-test*browser_navigate": "allow",
+        "playwright-test*browser_navigate_back": "allow",
+        "playwright-test*browser_network_requests": "allow",
+        "playwright-test*browser_press_key": "allow",
+        "playwright-test*browser_select_option": "allow",
+        "playwright-test*browser_snapshot": "allow",
+        "playwright-test*browser_take_screenshot": "allow",
+        "playwright-test*browser_type": "allow",
+        "playwright-test*browser_wait_for": "allow",
+        "playwright-test*planner_setup_page": "allow"
+      }
+    }
+  }
+}

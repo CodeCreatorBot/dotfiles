@@ -1,0 +1,85 @@
+# .chezmoiignore — env-driven. Single source of truth: [data] in chezmoi.toml.
+# Patterns match TARGET paths (after dot_ prefix stripping), not source paths.
+
+# ── Repo-internal files (never applied) ──
+# NOTE: chezmoi v2.71 breaks all patterns after a directory-glob match on
+# an existing source dir, so archive entries are explicit filenames.
+# Add each new archived file here.
+AGENTS.md
+.config/AGENTS.md
+PLAN.md
+README.md
+.pre-commit-config.yaml
+archive/**
+tests/**
+
+# ── Per-host secrets (never tracked; sourced if present) ──
+.bash.d/secrets.sh
+.bash.d/local.sh
+.config/powershell/secrets.ps1
+
+# ── Windows work tooling (env = work-dev AND windows OS) ──
+{{ if or (ne (.env | default "dev") "work-dev") (ne .chezmoi.os "windows") }}
+.config/powershell/**
+{{ end }}
+
+# ── Azure DevOps / corporate work tooling (env = work-dev) ──
+{{ if ne (.env | default "dev") "work-dev" }}
+.config/opencode/skills/azure-devops-cli/**
+.pi/agent/agents/ticketer.md
+.pi/agent/mcp.json
+{{ end }}
+
+# ── Desktop environment (env = desktop only) ──
+{{ if ne (.env | default "dev") "desktop" }}
+.config/hypr/**
+.config/waybar/**
+.config/dunst/**
+.config/walker/**
+.config/satty/**
+.config/elephant/**
+.config/wallpapers/**
+.config/matugen/**
+.config/chromium-flags.conf
+.config/iwd/**
+.config/obsidian/**
+{{ end }}
+
+# ── Desktop sub-switches (env = desktop, per-tool opt-outs) ──
+{{ if and (eq (.env | default "dev") "desktop") (not (.hypr | default false)) }}
+.config/hypr/**
+{{ end }}
+{{ if and (eq (.env | default "dev") "desktop") (not (.waybar | default false)) }}
+.config/waybar/**
+{{ end }}
+{{ if and (eq (.env | default "dev") "desktop") (not (.dunst | default false)) }}
+.config/dunst/**
+{{ end }}
+{{ if and (eq (.env | default "dev") "desktop") (not (.walker | default false)) }}
+.config/walker/**
+{{ end }}
+{{ if and (eq (.env | default "dev") "desktop") (not (.satty | default false)) }}
+.config/satty/**
+{{ end }}
+{{ if and (eq (.env | default "dev") "desktop") (not (.elephant | default false)) }}
+.config/elephant/**
+{{ end }}
+{{ if and (eq (.env | default "dev") "desktop") (not (.wallpapers | default false)) }}
+.config/wallpapers/**
+{{ end }}
+{{ if and (eq (.env | default "dev") "desktop") (not (.matugen | default false)) }}
+.config/matugen/**
+{{ end }}
+{{ if and (eq (.env | default "dev") "desktop") (not (.chromium | default false)) }}
+.config/chromium-flags.conf
+{{ end }}
+{{ if and (eq (.env | default "dev") "desktop") (not (.iwd | default false)) }}
+.config/iwd/**
+{{ end }}
+{{ if and (eq (.env | default "dev") "desktop") (not (.onedrive | default false)) }}
+.config/onedrive/**
+.config/systemd/**
+{{ end }}
+{{ if and (eq (.env | default "dev") "desktop") (not (.obsidian | default false)) }}
+.config/obsidian/**
+{{ end }}

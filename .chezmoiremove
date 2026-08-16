@@ -1,0 +1,13 @@
+# Remove stale files from the old manual bootstrap setup.
+#
+# .chezmoiremove patterns use the same syntax as .chezmoiignore (target
+# paths).  Once the stale file is gone, remove the pattern — it won't
+# cause errors if the file is already removed, but it keeps the ignore
+# file small.
+.config/bootstrap/packages.arch.sh
+.config/bootstrap/packages.dev.sh
+.config/bootstrap/packages.fedora.sh
+.config/bootstrap/packages.toolchains.sh
+.config/bootstrap/packages.win.sh
+.config/bootstrap/packages.work.sh
+.local/bin/bootstrap

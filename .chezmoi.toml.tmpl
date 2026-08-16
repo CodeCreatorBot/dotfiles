@@ -1,0 +1,32 @@
+# Environment selector — the single toggle that decides what gets applied.
+# `chezmoi init` generates this once; edit freely afterwards (re-run
+# `chezmoi init` ONLY if the upstream template changes).
+#
+#   dev       dev tooling + all toolchains (everything on, no switches)
+#   work-dev  dev + Azure DevOps / corporate work tooling (Windows files
+#             additionally require a Windows OS)
+#   desktop   dev + desktop environment, tuned by the switches below
+
+[data]
+env = "desktop"
+
+# ── Variables ──
+ONEDRIVE_DIR = "/mnt/hdd/OneDrive"
+
+# ── Desktop switches (only used when env = "desktop") ──
+# Gate both file deployment (chezmoi) and package installs (bootstrap).
+hypr = true
+waybar = true
+dunst = true
+walker = true
+satty = true
+elephant = true
+wallpapers = true
+matugen = true
+chromium = true
+iwd = true
+onedrive = true
+flatpak = true
+obsidian = true
+docker = true
+bluetooth = true

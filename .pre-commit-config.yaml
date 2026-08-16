@@ -1,0 +1,54 @@
+# .pre-commit-config.yaml — repo-internal (see .chezmoiignore), local dev only.
+#
+# Install (once per machine):   uv tool install pre-commit   (or: pipx, pip)
+# Activate:                     pre-commit install
+# Run once:                     pre-commit run --all-files
+# One-off without installing:   uvx pre-commit run <hook> --all-files
+#
+# Why this set — and what is deliberately absent:
+# - .tmpl files are Go templates, not the language they look like. Hooks that
+#   parse or rewrite content (whitespace fixers, shellcheck, shfmt) EXCLUDE
+#   them; template validity is covered by the local `chezmoi-render` hook.
+# - dot_config/nvim/ is vendored third-party — mutating hooks skip it.
+# - archive/ holds retired scripts — still secret-scanned, not linted.
+# - No shfmt/markdownlint/conventional-commits here: kept out of the required
+#   path to stay fast and quiet on a one-user repo. Add when wanted.
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+        exclude: '\.tmpl$|^dot_config/nvim/'
+      - id: end-of-file-fixer
+        exclude: '\.tmpl$|^dot_config/nvim/'
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-yaml
+        exclude: '\.tmpl$'
+      - id: check-toml
+        exclude: '\.tmpl$'
+      - id: check-json
+      - id: detect-private-key
+
+  # Secrets — the one non-negotiable for a dotfiles repo.
+  # Scans the staged diff on every commit; blocks before anything lands.
+  # (gitleaks, not git-secrets/detect-secrets: git-secrets needs per-repo
+  # pattern registration on every machine; detect-secrets wants a baseline
+  # file that churns on a repo with zero secrets. gitleaks is zero-config.)
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  # Chezmoi-specific: every changed .tmpl must still render with the real
+  # config. Catches template syntax errors and missing data keys (chezmoi
+  # uses missingkey=error) that no formatter could catch.
+  - repo: local
+    hooks:
+      - id: chezmoi-render
+        name: chezmoi-render (templates compile)
+        entry: bash -c 'for f in "$@"; do chezmoi execute-template < "$f" >/dev/null || exit 1; done'
+        language: system
+        files: '\.tmpl$'
+        verbose: true

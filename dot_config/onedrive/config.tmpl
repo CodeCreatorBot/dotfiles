@@ -1,0 +1,18 @@
+# OneDrive client config (abraunegg/onedrive), rendered by chezmoi.
+# Docs: https://github.com/abraunegg/onedrive/blob/master/docs/application-config-options.md
+#
+# OneDrive client config (abraunegg/onedrive), rendered by chezmoi.
+# Docs: https://github.com/abraunegg/onedrive/blob/master/docs/application-config-options.md
+#
+# skip_dir entries are relative to sync_dir:
+#   bare name  -> skip every folder with that name, wherever it exists
+#   leading /  -> skip only that explicit path
+# Changing any of these after the first sync requires `onedrive --resync`.
+#
+# check_nomount: abort sync if a .nosync marker sits in the sync_dir mount point
+# (i.e. the HDD is unmounted). Marker must live on the rootfs mountpoint dir,
+# created BEFORE the disk is mounted, so it is only visible while unmounted.
+check_nomount = "true"
+check_nosync = "true"
+skip_dir = "Pictures"
+sync_dir = {{ .ONEDRIVE_DIR | default "~/OneDrive" | quote }}

@@ -1,0 +1,6 @@
+# Windows packages — consumed by run_once_before_10-windows.sh.tmpl
+# (env = work-dev only). posh-git is loaded in the PowerShell profile,
+# not installed here.
+windows:
+  winget:
+    - Alacritty.Alacritty

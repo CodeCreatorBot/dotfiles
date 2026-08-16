@@ -1,0 +1,82 @@
+#!/usr/bin/env bash
+# Fedora — dev packages + COPR + toolchains (run once, before dotfiles).
+# Package data: .chezmoidata/packages.fedora.yaml + packages.toolchains.yaml.
+# env={{ .env }}
+set -eu
+
+# Self-gate: chezmoi runs every run_ script on every OS.
+if [ -f /etc/fedora-release ] || grep -qs '^ID=fedora' /etc/os-release 2>/dev/null; then
+	:
+else
+	echo "Skip: not Fedora"
+	exit 0
+fi
+
+# ── package lists ───────────────────────────────────────────────────────
+
+PKG_DNF=({{ range .fedora.dnf }}"{{ . }}" {{ end }})
+COPR=({{ range .fedora.copr }}"{{ .repo }}:{{ .pkgs }}" {{ end }})
+
+CURL_INSTALLERS=({{ range .toolchains.curlInstallers }}"{{ .name }}|{{ .url }}|{{ .sh }}|{{ .post }}" {{ end }})
+
+# ── confirmation ────────────────────────────────────────────────────────
+
+echo
+echo "==> Fedora dev tooling (env={{ .env }})"
+echo
+echo "  dnf:    ${PKG_DNF[*]}"
+for entry in "${COPR[@]}"; do
+	echo "  copr:   ${entry%%:*} → ${entry#*:}"
+done
+for entry in "${CURL_INSTALLERS[@]}"; do
+	IFS='|' read -r name url interpreter post <<<"$entry"
+	printf '  curl:   %s' "$name"
+	[ -n "$post" ] && printf ' (+ %s)' "$post"
+	echo
+done
+echo
+read -rp "Install the above? [y/N] " yn
+case "$yn" in
+	[Yy]*) ;;
+	*)
+		echo "Aborted."
+		exit 0
+		;;
+esac
+
+# ── dnf ─────────────────────────────────────────────────────────────────
+
+sudo dnf install -y "${PKG_DNF[@]}"
+
+for entry in "${COPR[@]}"; do
+	repo="${entry%%:*}"
+	pkgs="${entry#*:}"
+	echo "==> copr: $repo → $pkgs"
+	sudo dnf copr enable -y "$repo"
+	# shellcheck disable=SC2086
+	sudo dnf install -y $pkgs
+done
+
+# ── toolchains ──────────────────────────────────────────────────────────
+
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$HOME/.cargo/bin:$HOME/.local/bin:$PATH"
+
+set -o pipefail  # curl | sh failures must not be masked
+
+for entry in "${CURL_INSTALLERS[@]}"; do
+	IFS='|' read -r name url interpreter post <<<"$entry"
+	echo "==> $name"
+	if command -v "$name" >/dev/null 2>&1; then
+		echo "    already installed — skipping"
+	else
+		# shellcheck disable=SC2086
+		curl -fsSL "$url" | $interpreter
+	fi
+	if [ -n "$post" ]; then
+		sh -c "$post"
+	fi
+done
+
+echo
+echo "Done."

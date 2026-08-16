@@ -1,0 +1,4 @@
+# per-host secrets — never tracked
+dot_bash.d/secrets.sh
+dot_bash.d/local.sh
+dot_config/powershell/secrets.ps1

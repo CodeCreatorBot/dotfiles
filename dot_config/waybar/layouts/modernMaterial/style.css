@@ -1,0 +1,361 @@
+/* Material You Waybar - Optimized for vertical space */
+@import "colors.css";
+* {
+  font-family:
+    "Google Sans Flex", "JetBrains Mono Nerd Font Propo",
+    "Material Symbols Rounded", sans-serif;
+  font-size: 11.9px;
+  font-weight: 500;
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+  opacity: 1;
+}
+
+/* Main bar - Compact to save vertical space */
+window#waybar {
+  background-color: transparent;
+  color: @on_surface;
+  padding: 0;
+  margin: 0;
+  border-radius: 20px;
+}
+
+/* Module containers */
+
+.modules-left,
+.modules-center,
+.modules-right {
+  background-color: @background;
+  padding: 0 8px;
+  border-radius: 20px;
+  margin-top: 5px;
+}
+/* Base style for modules - Material You Surface Container */
+#workspaces,
+#submap,
+#custom-omarchy,
+#custom-stasis,
+#idle_inhibitor,
+#clock,
+#custom-weather,
+#custom-update,
+#custom-screenrecording-indicator,
+#tray,
+#bluetooth,
+#power-profiles-daemon,
+#custom-notification,
+#network,
+#pulseaudio,
+#cpu,
+#battery,
+#custom-expand-icon {
+  background-color: @surface_container;
+  color: @on_surface;
+  padding: 4px 12px;
+  margin: 4px 2px;
+  border-radius: 20px;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Hover states - Material You elevation */
+#workspaces button:hover,
+#custom-omarchy:hover,
+#clock:hover,
+#custom-weather:hover,
+#custom-update:hover,
+#bluetooth:hover,
+#power-profiles-daemon:hover,
+#custom-notification:hover,
+#network:hover,
+#pulseaudio:hover,
+#cpu:hover,
+#battery:hover,
+#custom-expand-icon:hover {
+  background-color: @surface_container_high;
+  color: @on_surface;
+}
+
+/* Active states - Primary Container */
+#workspaces button.active,
+#workspaces button.focused {
+  background-color: @primary;
+  color: @on_primary;
+}
+
+/* Workspaces - Material compact layout */
+#workspaces {
+  padding: 2px 4px;
+  margin: 4px 4px;
+}
+
+#workspaces button {
+  background-color: transparent;
+  color: @on_surface_variant;
+  padding: 2px 8px;
+  margin: 0 2px;
+  border-radius: 16px;
+  min-width: 24px;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#workspaces button.urgent {
+  background-color: @error_container;
+  color: @on_error_container;
+}
+
+/* Submap - Secondary Container */
+#submap {
+  background-color: @secondary_container;
+  color: @on_secondary_container;
+  font-weight: 600;
+  padding: 4px 16px;
+}
+
+/* Custom menu - Primary */
+#custom-omarchy {
+  /*background-color: @primary;
+    color: @on_primary;*/
+  font-size: 16px;
+  padding: 4px 12px;
+  margin-left: 8px;
+  font-weight: 600;
+}
+#custom-stasis {
+}
+#custom-omarchy:hover {
+  /*background-color: @primary_fixed_dim;
+    color: @on_primary_fixed;*/
+}
+
+/* Clock - Surface Container Highest to stand out */
+#clock {
+  background-color: @surface_container_highest;
+  color: @on_surface;
+  font-weight: 600;
+  padding: 4px 16px;
+}
+
+/* Weather - Tertiary Container */
+#custom-weather {
+  background-color: @tertiary_container;
+  color: @on_tertiary_container;
+  padding: 4px 12px;
+}
+
+/* Updates - Error Container when updates are available */
+#custom-update {
+  background-color: @surface_container;
+  color: @on_surface_variant;
+  padding: 4px 10px;
+}
+
+/* Screen recording indicator - Error to draw attention */
+#custom-screenrecording-indicator {
+  background-color: @error_container;
+  color: @on_error_container;
+  padding: 4px 12px;
+}
+
+/* Battery - Adaptive states */
+#battery {
+  padding: 4px 12px;
+}
+
+#battery.charging {
+  background-color: @tertiary_container;
+  color: @on_tertiary_container;
+}
+
+#battery.warning {
+  background-color: @tertiary_container;
+  color: @on_tertiary_container;
+}
+
+#battery.critical {
+  background-color: @error_container;
+  color: @on_error_container;
+}
+
+#battery.full {
+  background-color: @primary_container;
+  color: @on_primary_container;
+}
+
+/* Bluetooth - States with Material colors */
+#bluetooth {
+  padding: 4px 12px;
+}
+
+#bluetooth.connected {
+  background-color: @primary_container;
+  color: @on_primary_container;
+}
+
+#bluetooth.disabled {
+  color: @on_surface_variant;
+}
+
+/* Power profiles - Clear icons */
+#power-profiles-daemon {
+  padding: 4px 12px;
+}
+
+/* Network - Visual states */
+#network {
+  padding: 4px 12px;
+}
+
+#network.disconnected {
+  background-color: @error_container;
+  color: @on_error_container;
+}
+
+#network.ethernet {
+  background-color: @primary_container;
+  color: @on_primary_container;
+}
+
+/* Pulseaudio - Volume display */
+#pulseaudio {
+  padding: 4px 12px;
+}
+
+#pulseaudio.muted {
+  color: @on_surface_variant;
+}
+
+#pulseaudio.bluetooth {
+  background-color: @secondary_container;
+  color: @on_secondary_container;
+}
+
+/* CPU - System monitoring */
+#cpu {
+  padding: 4px 12px;
+}
+
+/* Notifications - Notification states */
+#custom-notification {
+  padding: 4px 12px;
+  font-family: "Material Symbols Rounded";
+  font-size: 18px;
+}
+
+/* Tray - Material drawer design */
+#tray {
+  background-color: transparent;
+  padding: 0 4px;
+}
+
+#tray > .passive {
+  opacity: 0.6;
+}
+
+#tray > .needs-attention {
+  background-color: @error_container;
+  color: @on_error_container;
+  border-radius: 12px;
+}
+
+/* Expand icon for tray */
+#custom-expand-icon {
+  padding: 4px 8px;
+  margin-right: 0;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* Tray menu - Material You */
+#tray menu {
+  background-color: @surface;
+  border: 1px solid @outline_variant;
+  border-radius: 12px;
+  padding: 4px;
+}
+
+#tray menu menuitem {
+  background-color: transparent;
+  color: @on_surface;
+  border-radius: 8px;
+  padding: 6px 12px;
+  margin: 2px;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#tray menu menuitem:hover {
+  background-color: @primary_container;
+  color: @on_primary_container;
+}
+
+#tray menu menuitem:disabled {
+  color: @on_surface_variant;
+  opacity: 0.38;
+}
+
+/* Minimal visual separators */
+#tray menu separator {
+  background-color: @outline_variant;
+  margin: 4px 8px;
+}
+
+/* Tooltips - Material You Surface Container */
+tooltip {
+  background-color: @surface;
+  color: @on_surface;
+  border: 1px solid @outline_variant;
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+tooltip label {
+  color: @on_surface;
+}
+
+/* Tray-expander group */
+#tray.tray-group-item {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: 0;
+}
+
+/* MPRIS - Media player - Material You */
+#mpris {
+  background-color: @secondary_container;
+  color: @on_secondary_container;
+  padding: 4px 12px;
+  margin: 4px 2px;
+  border-radius: 20px;
+  transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  font-weight: 500;
+  min-width: 100px;
+}
+
+/* Active playback state */
+#mpris.playing {
+  background-color: @secondary_container;
+  color: @on_secondary_container;
+  animation: pulse-mpris 2s ease-in-out infinite;
+}
+
+/* Paused state - More subtle color */
+#mpris.paused {
+  background-color: @surface_container;
+  color: @on_surface_variant;
+  opacity: 0.7;
+}
+
+/* Hover - Material elevation */
+#mpris:hover {
+  background-color: @secondary_container;
+  color: @on_secondary_container;
+  padding: 4px 16px;
+}
+
+#mpris.paused:hover {
+  background-color: @surface_container_high;
+  color: @on_surface;
+  opacity: 1;
+}
+
+/* Pulse animation for active playback */

@@ -1,0 +1,89 @@
+# Arch Linux packages — consumed by run_once_before_10-arch.sh.tmpl
+# (dev + toolchains) and run_once_after_20-arch-desktop.sh.tmpl (desktop).
+#
+# Desktop packages are grouped BY SWITCH NAME. The switch VALUES live in
+# chezmoi.toml [data] (single source of truth — they also gate file
+# deployment in .chezmoiignore). This file only lists what each switch
+# installs.
+arch:
+  dev:
+    - neovim
+    - eza
+    - zoxide
+    - fzf
+    - starship
+    - ripgrep
+    - fd
+    - bat
+    - lazygit
+    - ghostty
+    - docker
+    - docker-compose
+
+  desktop:
+    hypr:
+      pacman:
+        - hyprland
+        - xdg-desktop-portal-hyprland
+        - hyprpolkitagent
+        - qt5-wayland
+        - qt6-wayland
+        - hyprpaper
+        - hypridle
+        - hyprlock
+        - impala
+        - grim
+        - wl-clipboard
+    waybar:
+      pacman:
+        - waybar
+    dunst:
+      pacman:
+        - dunst
+    matugen:
+      pacman:
+        - matugen
+    iwd:
+      pacman:
+        - iwd
+      services:
+        - iwd.service
+    satty:
+      pacman:
+        - satty
+    chromium:
+      pacman:
+        - chromium
+    obsidian:
+      pacman:
+        - obsidian
+    docker:
+      pacman:
+        - docker
+        - docker-compose
+      services:
+        - docker.service
+      groups:
+        - docker
+    bluetooth:
+      pacman:
+        - bluez
+        - bluez-utils
+      services:
+        - bluetooth.service
+    walker:
+      aur:
+        - walker
+    elephant:
+      aur:
+        - elephant-all
+    onedrive:
+      aur:
+        - onedrive-abraunegg
+    flatpak:
+      - com.stremium.Stremio
+      - com.github.geigi.cozy
+    aurExtras:
+      - bitwarden-bin
+      - grayjay-bin
+      - nordvpn-bin

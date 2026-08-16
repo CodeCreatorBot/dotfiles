@@ -1,0 +1,67 @@
+[init]
+	defaultBranch = master
+[pull]
+	rebase = true
+[status]
+	short = true
+	branch = true
+[fetch]
+	prune = true
+[worktree]
+	guessRemote = true
+[core]
+	editor = nvim
+[alias]
+	# Show a list of all the files that are being tracked.
+	show-tracked = ls-tree --name-only -r HEAD
+
+	# Stage the file for the next commit, but don't start tracking new files.
+	stage = add -u
+
+	# Make git aware of the existence of the file, but don't automatically stage
+	# it.
+	track = add -N
+
+	# Unstage the file from the next commit.
+	# Will also untrack a file that hasn't been commited once, so watch out!
+	unstage = reset --
+
+	# Make git unaware of the existence of the file (automatically unstages,
+	# since git doesn't know the file anymore)
+	untrack = rm --cached
+
+	# Shortcuts
+	l = log --oneline --decorate=full -n 40
+	c = commit
+	b = branch -vva
+	r = remote -v
+	s = status
+	sl = status --long
+	st = stage
+	ust = unstage
+	t = track
+	ut = untrack
+	a = add
+	dt = difftool
+	f = fetch --all
+[diff]
+	renames = true
+[merge]
+	conflictStyle = diff3
+	tool = diffview
+[mergetool]
+	prompt = false
+	keepBackup = false
+[mergetool "diffview"]
+	cmd = nvim -f -c "DiffviewOpen"
+{{ if ne (.env | default "dev") "work-dev" }}
+[user]
+	name = CodeCreatorBot
+	email = abhilash.misra2000@gmail.com
+
+# Machine-local trust: repos owned by other users (root-owned esp-idf toolchain,
+# shared homeserver repo) would otherwise trigger git "dubious ownership".
+[safe]
+	directory = /opt/esp-idf
+	directory = /mnt/hdd/repositories/homeserver
+{{ end }}

@@ -1,0 +1,13 @@
+[Unit]
+Description=OneDrive
+After=graphical-session.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/onedrive --monitor
+Restart=on-failure
+RestartSec=3
+TimeoutStopSec=20
+
+[Install]
+WantedBy=graphical-session.target

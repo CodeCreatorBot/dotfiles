@@ -1,0 +1,18 @@
+onboarding = false
+[keys]
+prefix = "ctrl+space"
+focus_pane_left = ["prefix+h", "alt+h"]
+focus_pane_down = ["prefix+j", "alt+j"]
+focus_pane_up = ["prefix+k", "alt+k"]
+focus_pane_right = ["prefix+l", "alt+l"]
+previous_tab = ["prefix+p", "alt+["]
+next_tab = ["prefix+n", "alt+]"]
+switch_workspace = "alt+1..9"
+previous_agent = "alt+shift+["
+next_agent = "alt+shift+]"
+
+[ui]
+mouse_capture = false
+
+[theme]
+name = "nord"

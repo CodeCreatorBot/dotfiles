@@ -1,0 +1,19 @@
+{
+  "theme": "dark",
+  "packages": [
+    "npm:pi-subagents",
+    "npm:pi-lens",
+    "npm:pi-intercom",
+    "npm:pi-web-access"
+  ],
+  "subagents": {
+    "agentOverrides": {
+      "scout": {},
+      "researcher": {},
+      "worker": { "thinking": "medium" },
+      "reviewer": { "thinking": "medium" },
+      "oracle": { "thinking": "medium" },
+      "planner": { "thinking": "medium" }
+    }
+  }
+}

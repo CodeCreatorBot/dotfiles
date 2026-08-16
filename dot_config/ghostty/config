@@ -1,0 +1,2 @@
+theme = "Matugen"
+shell-integration-features = ssh-terminfo
