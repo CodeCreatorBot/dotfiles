@@ -21,7 +21,7 @@ toolchains:
       sh: sh
       post: ""
     - name: lazydocker
-      url: https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_lazydocker.sh
+      url: https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh
       sh: bash
       post: ""
     - name: rustup
