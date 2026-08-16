@@ -30,6 +30,13 @@ tests/**
 .pi/agent/mcp.json
 {{ end }}
 
+# ── opencode agent/skill bundles (opt-in switches, default OFF) ──
+{{ $pw := false }}{{ if hasKey . "opencode_playwright" }}{{ $pw = .opencode_playwright }}{{ end }}
+{{ if not $pw }}
+.config/opencode/agents/playwright-*
+.config/opencode/skills/playwright-cli/**
+{{ end }}
+
 # ── Desktop environment (env = desktop only) ──
 {{ if ne (.env | default "dev") "desktop" }}
 .config/hypr/**

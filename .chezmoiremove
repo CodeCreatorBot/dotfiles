@@ -11,3 +11,9 @@
 .config/bootstrap/packages.win.sh
 .config/bootstrap/packages.work.sh
 .local/bin/bootstrap
+
+# Prompts folded into managed agents (dot_config/opencode/agents/*.md); these
+# were create_-rendered once, so chezmoi removes the leftovers.
+.config/opencode/prompts/playwright-test-generator.md
+.config/opencode/prompts/playwright-test-healer.md
+.config/opencode/prompts/playwright-test-planner.md

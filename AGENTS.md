@@ -14,7 +14,8 @@ one `env` toggle plus per-tool switches; everything else is mechanical.
   switch-tuned).
 - **The env model is load-bearing:** dev tooling has no switches; desktop-only
   files go behind `env = "desktop"` + a switch; work-only files behind
-  `env = "work-dev"`. Extend it, don't rework it.
+  `env = "work-dev"`. Extend it, don't rework it. (Exception: opencode
+  agent/skill bundles are opt-in switches, default off.)
 
 ## Areas
 
@@ -50,7 +51,9 @@ one `env` toggle plus per-tool switches; everything else is mechanical.
   `archive/**` are chezmoiignored. Add any new doc file to `.chezmoiignore`
   too (target-path patterns, e.g. `.config/AGENTS.md`).
 - **`create_`-prefixed files are host-specific:** rendered once at init, never
-  overwritten (pi, opencode, skills); no provider/model/API keys in them.
+  overwritten (pi, opencode config); no provider/model/API keys in them.
+  Shared opencode agents/skills are **managed** (sync on pull);
+  retiring a `create_` file → add its target path to `.chezmoiremove`.
 - Commits: conventional, focused, atomic (`feat:`/`fix:`/`docs:`/`chore:`).
 
 ## Conventions (compact)

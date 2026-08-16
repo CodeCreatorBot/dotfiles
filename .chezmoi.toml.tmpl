@@ -13,6 +13,10 @@ env = "desktop"
 # ── Variables ──
 ONEDRIVE_DIR = "/mnt/hdd/OneDrive"
 
+# ── opencode optional bundles (any env, opt-in, default OFF) ──
+# Flip on to deploy the playwright agents + cli skill.
+opencode_playwright = false
+
 # ── Desktop switches (only used when env = "desktop") ──
 # Gate both file deployment (chezmoi) and package installs (bootstrap).
 hypr = true
