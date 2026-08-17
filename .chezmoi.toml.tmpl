@@ -19,18 +19,11 @@ opencode_playwright = false
 
 # ── Desktop switches (only used when env = "desktop") ──
 # Gate both file deployment (chezmoi) and package installs (bootstrap).
-hypr = true
-waybar = true
-dunst = true
-walker = true
-satty = true
-elephant = true
-wallpapers = true
-matugen = true
-chromium = true
-iwd = true
+# calestia is the desktop-shell composite (replaces waybar, dunst, walker,
+# matugen, satty, hyprlock/hypridle/hyprpaper, elephant); the per-tool
+# switches below survive independently of it.
+calestia = true
 onedrive = true
 flatpak = true
 obsidian = true
 docker = true
-bluetooth = true

@@ -1,2 +1,2 @@
-theme = "Matugen"
+theme = "nord"
 shell-integration-features = ssh-terminfo

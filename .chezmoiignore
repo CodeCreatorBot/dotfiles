@@ -40,53 +40,27 @@ tests/**
 
 # ── Desktop environment (env = desktop only) ──
 {{ if ne (.env | default "dev") "desktop" }}
-.config/hypr/**
-.config/waybar/**
-.config/dunst/**
-.config/walker/**
-.config/satty/**
-.config/elephant/**
-.config/wallpapers/**
-.config/matugen/**
-.config/chromium-flags.conf
-.config/iwd/**
+.config/caelestia/**
 .config/obsidian/**
 {{ end }}
 
+# ── Desktop hand-offs to caelestia (env = desktop) ──
+# caelestia's `starship` dot overwrites ~/.config/starship.toml, so chezmoi
+# stops managing it on desktop; it stays managed on dev/work-dev.
+{{ if eq (.env | default "dev") "desktop" }}
+.config/starship.toml
+{{ end }}
+
 # ── Desktop sub-switches (env = desktop, per-tool opt-outs) ──
-{{ if and (eq (.env | default "dev") "desktop") (not (.hypr | default false)) }}
-.config/hypr/**
-{{ end }}
-{{ if and (eq (.env | default "dev") "desktop") (not (.waybar | default false)) }}
-.config/waybar/**
-{{ end }}
-{{ if and (eq (.env | default "dev") "desktop") (not (.dunst | default false)) }}
-.config/dunst/**
-{{ end }}
-{{ if and (eq (.env | default "dev") "desktop") (not (.walker | default false)) }}
-.config/walker/**
-{{ end }}
-{{ if and (eq (.env | default "dev") "desktop") (not (.satty | default false)) }}
-.config/satty/**
-{{ end }}
-{{ if and (eq (.env | default "dev") "desktop") (not (.elephant | default false)) }}
-.config/elephant/**
-{{ end }}
-{{ if and (eq (.env | default "dev") "desktop") (not (.wallpapers | default false)) }}
-.config/wallpapers/**
-{{ end }}
-{{ if and (eq (.env | default "dev") "desktop") (not (.matugen | default false)) }}
-.config/matugen/**
-{{ end }}
-{{ if and (eq (.env | default "dev") "desktop") (not (.chromium | default false)) }}
-.config/chromium-flags.conf
-{{ end }}
-{{ if and (eq (.env | default "dev") "desktop") (not (.iwd | default false)) }}
-.config/iwd/**
+# calestia is the desktop-shell composite (replaces waybar, dunst, walker,
+# matugen, satty, elephant, wallpapers + the old gated hypr tree); only the
+# thin ~/.config/caelestia/ override hooks are chezmoi-managed.
+{{ if and (eq (.env | default "dev") "desktop") (not (.calestia | default false)) }}
+.config/caelestia/**
 {{ end }}
 {{ if and (eq (.env | default "dev") "desktop") (not (.onedrive | default false)) }}
 .config/onedrive/**
-.config/systemd/**
+.config/systemd/user/onedrive.service
 {{ end }}
 {{ if and (eq (.env | default "dev") "desktop") (not (.obsidian | default false)) }}
 .config/obsidian/**

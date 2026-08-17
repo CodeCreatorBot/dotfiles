@@ -17,3 +17,18 @@
 .config/opencode/prompts/playwright-test-generator.md
 .config/opencode/prompts/playwright-test-healer.md
 .config/opencode/prompts/playwright-test-planner.md
+
+# Desktop visuals retired with the move to Caelestia Shell.
+# MIGRATION-ONLY: purges the old manually-managed trees on the current host.
+# Inert on fresh installs (files never existed; chezmoi only removes files it
+# has managed, so a hypr config created later by `caelestia install` is safe).
+.config/hypr
+.config/waybar
+.config/dunst
+.config/walker
+.config/elephant
+.config/matugen
+.config/satty
+.config/wallpapers
+.config/iwd
+.config/systemd/user/elephant.service
