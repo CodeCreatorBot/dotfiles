@@ -13,6 +13,7 @@ README.md
 .pre-commit-config.yaml
 archive/**
 tests/**
+docs/caelestia-cachyos-quickshell-fix.md
 
 # ── Per-host secrets (never tracked; sourced if present) ──
 .bash.d/secrets.sh
