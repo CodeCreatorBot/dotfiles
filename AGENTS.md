@@ -20,7 +20,7 @@ truth: `chezmoi.toml` `[data]` — `env` + switches — which gates file deploy
 - Templates over `.chezmoidata/packages.<os>.yaml` — never hardcode package lists. `before_` = dev/toolchains; `after_` = desktop.
 - `run_once_` re-runs when rendered content changes (toggle a switch → new checksum → re-prompt).
 - Self-gate: every script exits early unless on the right OS/env.
-- **`calestia`** (desktop-shell composite): AUR `caelestia-cli` + `caelestia-shell`; owns `~/.config/hypr` via `caelestia install` (**hypr component only** — others clobber chezmoi files). chezmoi ships only `dot_config/caelestia/{hypr-vars,hypr-user}.lua`.
+- **`calestia`** (desktop-shell composite): AUR `caelestia-cli` + `caelestia-shell`; owns `~/.config/hypr` via `caelestia install` (**hypr component only** — others clobber chezmoi files). chezmoi ships only `dot_config/caelestia/{hypr-vars,hypr-user}.lua` plus `dot_config/caelestia/templates/theme.ghostty` (a caelestia **user template** the CLI renders to `~/.local/state/caelestia/theme/theme.ghostty`, which the ghostty config's `theme` points at).
 - Retire: move to `archive/`, strip `run_`, add path to `.chezmoiignore`.
 
 ## Conventions
