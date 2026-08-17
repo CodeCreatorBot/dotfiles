@@ -21,39 +21,22 @@ arch:
     - docker-compose
 
   desktop:
-    hypr:
+    # Caelestia Shell (Quickshell-based desktop shell on top of Hyprland).
+    # Replaces waybar, dunst, walker, matugen, satty, hyprlock/hypridle/
+    # hyprpaper, elephant. Hyprland stays (the shell is NOT a compositor);
+    # its visual config is owned by the caelestia dots, not chezmoi.
+    # caelestia-cli/shell pull their transitive deps (quickshell-git, grim,
+    # slurp, swappy, wl-clipboard, cliphist, fuzzel, …) via yay.
+    caelestia:
       pacman:
         - hyprland
         - xdg-desktop-portal-hyprland
         - hyprpolkitagent
         - qt5-wayland
         - qt6-wayland
-        - hyprpaper
-        - hypridle
-        - hyprlock
-        - impala
-        - grim
-        - wl-clipboard
-    waybar:
-      pacman:
-        - waybar
-    dunst:
-      pacman:
-        - dunst
-    matugen:
-      pacman:
-        - matugen
-    iwd:
-      pacman:
-        - iwd
-      services:
-        - iwd.service
-    satty:
-      pacman:
-        - satty
-    chromium:
-      pacman:
-        - chromium
+      aur:
+        - caelestia-cli
+        - caelestia-shell
     obsidian:
       pacman:
         - obsidian
@@ -65,23 +48,11 @@ arch:
         - docker.service
       groups:
         - docker
-    bluetooth:
-      pacman:
-        - bluez
-        - bluez-utils
-      services:
-        - bluetooth.service
-    walker:
-      aur:
-        - walker
-    elephant:
-      aur:
-        - elephant-all
     onedrive:
       aur:
         - onedrive-abraunegg
     flatpak:
-      - com.stremium.Stremio
+      - com.stremio.Stremio
       - com.github.geigi.cozy
     aurExtras:
       - bitwarden-bin

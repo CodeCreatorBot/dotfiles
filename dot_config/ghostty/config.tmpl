@@ -1,0 +1,8 @@
+# Desktop-only (env=desktop + caelestia switch): the caelestia CLI renders the
+# dynamic Material-You theme to this path on every scheme/wallpaper change (see
+# dot_config/caelestia/templates/theme.ghostty). Reload with `ctrl+shift+,`.
+# Any other env falls back to ghostty's built-in default theme.
+{{ if and (eq (.env | default "dev") "desktop") (.caelestia | default false) }}
+theme = {{ .chezmoi.homeDir }}/.local/state/caelestia/theme/theme.ghostty
+{{ end }}
+shell-integration-features = ssh-terminfo

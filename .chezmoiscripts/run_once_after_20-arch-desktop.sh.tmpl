@@ -23,27 +23,9 @@ FLATPAKS=()
 SERVICES_ENABLE=()
 GROUPS_ADD=()
 
-{{ if .hypr }}
-PKG_PACMAN+=({{ range .arch.desktop.hypr.pacman }}"{{ . }}" {{ end }})
-{{ end }}
-{{ if .waybar }}
-PKG_PACMAN+=({{ range .arch.desktop.waybar.pacman }}"{{ . }}" {{ end }})
-{{ end }}
-{{ if .dunst }}
-PKG_PACMAN+=({{ range .arch.desktop.dunst.pacman }}"{{ . }}" {{ end }})
-{{ end }}
-{{ if .matugen }}
-PKG_PACMAN+=({{ range .arch.desktop.matugen.pacman }}"{{ . }}" {{ end }})
-{{ end }}
-{{ if .iwd }}
-PKG_PACMAN+=({{ range .arch.desktop.iwd.pacman }}"{{ . }}" {{ end }})
-SERVICES_ENABLE+=({{ range .arch.desktop.iwd.services }}"{{ . }}" {{ end }})
-{{ end }}
-{{ if .satty }}
-PKG_PACMAN+=({{ range .arch.desktop.satty.pacman }}"{{ . }}" {{ end }})
-{{ end }}
-{{ if .chromium }}
-PKG_PACMAN+=({{ range .arch.desktop.chromium.pacman }}"{{ . }}" {{ end }})
+{{ if .caelestia }}
+PKG_PACMAN+=({{ range .arch.desktop.caelestia.pacman }}"{{ . }}" {{ end }})
+PKG_AUR+=({{ range .arch.desktop.caelestia.aur }}"{{ . }}" {{ end }})
 {{ end }}
 {{ if .obsidian }}
 PKG_PACMAN+=({{ range .arch.desktop.obsidian.pacman }}"{{ . }}" {{ end }})
@@ -52,16 +34,6 @@ PKG_PACMAN+=({{ range .arch.desktop.obsidian.pacman }}"{{ . }}" {{ end }})
 PKG_PACMAN+=({{ range .arch.desktop.docker.pacman }}"{{ . }}" {{ end }})
 SERVICES_ENABLE+=({{ range .arch.desktop.docker.services }}"{{ . }}" {{ end }})
 GROUPS_ADD+=({{ range .arch.desktop.docker.groups }}"{{ . }}" {{ end }})
-{{ end }}
-{{ if .bluetooth }}
-PKG_PACMAN+=({{ range .arch.desktop.bluetooth.pacman }}"{{ . }}" {{ end }})
-SERVICES_ENABLE+=({{ range .arch.desktop.bluetooth.services }}"{{ . }}" {{ end }})
-{{ end }}
-{{ if .walker }}
-PKG_AUR+=({{ range .arch.desktop.walker.aur }}"{{ . }}" {{ end }})
-{{ end }}
-{{ if .elephant }}
-PKG_AUR+=({{ range .arch.desktop.elephant.aur }}"{{ . }}" {{ end }})
 {{ end }}
 {{ if .onedrive }}
 PKG_AUR+=({{ range .arch.desktop.onedrive.aur }}"{{ . }}" {{ end }})
@@ -98,12 +70,9 @@ fi
 if [ ${#GROUPS_ADD[@]} -gt 0 ]; then
 	echo "  groups (add $USER):      ${GROUPS_ADD[*]}"
 fi
-if ! grep -q '^\[multilib\]' /etc/pacman.conf 2>/dev/null; then
-	echo "  multilib: enable in /etc/pacman.conf"
+if [ ${#PKG_AUR[@]} -gt 0 ]; then
+	echo "  caelestia shell: comes in via AUR (caelestia-cli + caelestia-shell)"
 fi
-{{ if .iwd }}
-echo "  iwd: deploy ~/.config/iwd/main.conf → /etc/iwd/main.conf"
-{{ end }}
 echo
 read -rp "Install the above? [y/N] " yn
 case "$yn" in
@@ -114,23 +83,11 @@ case "$yn" in
 		;;
 esac
 
-# ── multilib ────────────────────────────────────────────────────────────
-
-if ! grep -q '^\[multilib\]' /etc/pacman.conf 2>/dev/null; then
-	echo "==> enabling multilib"
-	sudo tee -a /etc/pacman.conf >/dev/null <<'EOF'
-
-[multilib]
-Include = /etc/pacman.d/mirrorlist
-EOF
-else
-	echo "multilib already enabled"
-fi
-
-# ── pacman ──────────────────────────────────────────────────────────────
+# ── pacman (full upgrade — a plain -Sy partial upgrade can resolve
+#    libav* deps against stale packages and fail the transaction) ─────────
 
 if [ ${#PKG_PACMAN[@]} -gt 0 ]; then
-	sudo pacman -Sy --needed --noconfirm "${PKG_PACMAN[@]}"
+	sudo pacman -Syu --needed --noconfirm "${PKG_PACMAN[@]}"
 fi
 
 # ── AUR (bootstrap yay if needed) ───────────────────────────────────────
@@ -145,6 +102,20 @@ if [ ${#PKG_AUR[@]} -gt 0 ]; then
 	fi
 	echo "==> yay: ${PKG_AUR[*]}"
 	yay -S --needed --noconfirm "${PKG_AUR[@]}"
+fi
+
+# ── caelestia (post-install) ─────────────────────────────────────────────
+
+if [ ${#PKG_AUR[@]} -gt 0 ] && command -v caelestia >/dev/null 2>&1; then
+	if [ ! -f "${XDG_STATE_HOME:-$HOME/.local/state}/caelestia/scheme.json" ]; then
+		echo "==> caelestia: create default scheme"
+		caelestia scheme set -n caelestia || echo "    (deferred — run 'caelestia scheme set -n caelestia' in-session)"
+	fi
+	echo "==> caelestia: shell + cli installed."
+	echo "    Hand over the desktop visuals in your Wayland session:"
+	echo "      caelestia install   # select ONLY the 'hypr' component!"
+	echo "    (Other components overwrite chezmoi-managed files, e.g."
+	echo "     starship.toml / lazygit — skip them.)"
 fi
 
 # ── flatpak ─────────────────────────────────────────────────────────────
@@ -177,15 +148,6 @@ for grp in "${GROUPS_ADD[@]}"; do
 		sudo usermod -aG "$grp" "$USER"
 	fi
 done
-
-{{ if .iwd }}
-# iwd config → /etc (replaces the old run_onchange script)
-if [ -f "$HOME/.config/iwd/main.conf" ]; then
-	echo "==> iwd: deploy /etc/iwd/main.conf"
-	sudo install -D "$HOME/.config/iwd/main.conf" /etc/iwd/main.conf
-	sudo systemctl restart iwd
-fi
-{{ end }}
 
 echo
 echo "Done."
