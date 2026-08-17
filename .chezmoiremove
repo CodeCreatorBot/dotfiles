@@ -1,34 +1,23 @@
-# Remove stale files from the old manual bootstrap setup.
+# Remove stale files from retired setups.
 #
 # .chezmoiremove patterns use the same syntax as .chezmoiignore (target
 # paths).  Once the stale file is gone, remove the pattern — it won't
 # cause errors if the file is already removed, but it keeps the ignore
 # file small.
-.config/bootstrap/packages.arch.sh
-.config/bootstrap/packages.dev.sh
-.config/bootstrap/packages.fedora.sh
-.config/bootstrap/packages.toolchains.sh
-.config/bootstrap/packages.win.sh
-.config/bootstrap/packages.work.sh
-.local/bin/bootstrap
 
-# Prompts folded into managed agents (dot_config/opencode/agents/*.md); these
-# were create_-rendered once, so chezmoi removes the leftovers.
+# Playwright prompts folded into managed agents
+# (dot_config/opencode/agents/*.md); these were create_-rendered once, so
+# chezmoi removes the leftovers.
 .config/opencode/prompts/playwright-test-generator.md
 .config/opencode/prompts/playwright-test-healer.md
 .config/opencode/prompts/playwright-test-planner.md
 
-# Desktop visuals retired with the move to Caelestia Shell.
-# MIGRATION-ONLY: purges the old manually-managed trees on the current host.
-# Inert on fresh installs (files never existed; chezmoi only removes files it
-# has managed, so a hypr config created later by `caelestia install` is safe).
-.config/hypr
-.config/waybar
-.config/dunst
-.config/walker
-.config/elephant
-.config/matugen
-.config/satty
-.config/wallpapers
-.config/iwd
-.config/systemd/user/elephant.service
+# Hand-offs to Caelestia Shell: orphaned host files the adoption commit left
+# behind (the retired trees themselves were already purged by the previous
+# .chezmoiremove pass — these are the lingering stragglers).
+# MIGRATION-ONLY: inert on fresh hosts (files never existed; chezmoi only
+# removes files it has managed / that a prior pass left dangling).
+.config/chromium-flags.conf
+.config/noctalia
+.config/systemd/user/dunst.service
+.config/systemd/user/graphical-session.target.wants/elephant.service

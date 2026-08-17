@@ -10,7 +10,6 @@
 #   parse or rewrite content (whitespace fixers, shellcheck, shfmt) EXCLUDE
 #   them; template validity is covered by the local `chezmoi-render` hook.
 # - dot_config/nvim/ is vendored third-party — mutating hooks skip it.
-# - archive/ holds retired scripts — still secret-scanned, not linted.
 # - No shfmt/markdownlint/conventional-commits here: kept out of the required
 #   path to stay fast and quiet on a one-user repo. Add when wanted.
 

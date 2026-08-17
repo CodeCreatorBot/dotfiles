@@ -14,5 +14,8 @@ next_agent = "alt+shift+]"
 [ui]
 mouse_capture = false
 
+# `terminal` follows the host terminal's ANSI palette: on desktop (env=desktop)
+# ghostty carries caelestia's Material-You palette, so herdr matches it
+# automatically; elsewhere it follows the terminal default — no gating needed.
 [theme]
-name = "nord"
+name = "terminal"

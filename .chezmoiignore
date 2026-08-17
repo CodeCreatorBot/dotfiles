@@ -11,7 +11,6 @@ LICENSE
 PLAN.md
 README.md
 .pre-commit-config.yaml
-archive/**
 tests/**
 docs/caelestia-cachyos-quickshell-fix.md
 
@@ -53,10 +52,10 @@ docs/caelestia-cachyos-quickshell-fix.md
 {{ end }}
 
 # ── Desktop sub-switches (env = desktop, per-tool opt-outs) ──
-# calestia is the desktop-shell composite (replaces waybar, dunst, walker,
+# caelestia is the desktop-shell composite (replaces waybar, dunst, walker,
 # matugen, satty, elephant, wallpapers + the old gated hypr tree); only the
 # thin ~/.config/caelestia/ override hooks are chezmoi-managed.
-{{ if and (eq (.env | default "dev") "desktop") (not (.calestia | default false)) }}
+{{ if and (eq (.env | default "dev") "desktop") (not (.caelestia | default false)) }}
 .config/caelestia/**
 {{ end }}
 {{ if and (eq (.env | default "dev") "desktop") (not (.onedrive | default false)) }}

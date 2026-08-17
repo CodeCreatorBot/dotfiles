@@ -27,7 +27,7 @@ arch:
     # its visual config is owned by the caelestia dots, not chezmoi.
     # caelestia-cli/shell pull their transitive deps (quickshell-git, grim,
     # slurp, swappy, wl-clipboard, cliphist, fuzzel, …) via yay.
-    calestia:
+    caelestia:
       pacman:
         - hyprland
         - xdg-desktop-portal-hyprland

@@ -23,9 +23,9 @@ FLATPAKS=()
 SERVICES_ENABLE=()
 GROUPS_ADD=()
 
-{{ if .calestia }}
-PKG_PACMAN+=({{ range .arch.desktop.calestia.pacman }}"{{ . }}" {{ end }})
-PKG_AUR+=({{ range .arch.desktop.calestia.aur }}"{{ . }}" {{ end }})
+{{ if .caelestia }}
+PKG_PACMAN+=({{ range .arch.desktop.caelestia.pacman }}"{{ . }}" {{ end }})
+PKG_AUR+=({{ range .arch.desktop.caelestia.aur }}"{{ . }}" {{ end }})
 {{ end }}
 {{ if .obsidian }}
 PKG_PACMAN+=({{ range .arch.desktop.obsidian.pacman }}"{{ . }}" {{ end }})
@@ -71,7 +71,7 @@ if [ ${#GROUPS_ADD[@]} -gt 0 ]; then
 	echo "  groups (add $USER):      ${GROUPS_ADD[*]}"
 fi
 if [ ${#PKG_AUR[@]} -gt 0 ]; then
-	echo "  calestia shell: comes in via AUR (caelestia-cli + caelestia-shell)"
+	echo "  caelestia shell: comes in via AUR (caelestia-cli + caelestia-shell)"
 fi
 echo
 read -rp "Install the above? [y/N] " yn
@@ -104,7 +104,7 @@ if [ ${#PKG_AUR[@]} -gt 0 ]; then
 	yay -S --needed --noconfirm "${PKG_AUR[@]}"
 fi
 
-# ── calestia (post-install) ─────────────────────────────────────────────
+# ── caelestia (post-install) ─────────────────────────────────────────────
 
 if [ ${#PKG_AUR[@]} -gt 0 ] && command -v caelestia >/dev/null 2>&1; then
 	if [ ! -f "${XDG_STATE_HOME:-$HOME/.local/state}/caelestia/scheme.json" ]; then

@@ -52,13 +52,15 @@ installed: change it, run `chezmoi apply`, done.
 |------------|------------------------------------------------------------|
 | `dev`      | all dev tooling + toolchains (everything on, no switches)  |
 | `work-dev` | dev + Azure DevOps / corporate tooling (Windows files additionally require a Windows host) |
-| `desktop`  | dev + desktop environment (Hyprland, Waybar, …), switch-tuned |
+| `desktop`  | dev + desktop environment (Hyprland + Caelestia Shell), switch-tuned |
 
-**Decision 2 — desktop switches (only when `env = "desktop"`):** one boolean
-per desktop tool (`hypr`, `waybar`, `dunst`, `matugen`, `flatpak`, …, full
-list below the `[data]` header). `false` skips that tool's files **and**
-packages. Toggling a switch re-runs the desktop installer on next apply (it
-re-renders with the new package list) and re-prompts.
+**Decision 2 — desktop switches (only when `env = "desktop"`):** a single
+`caelestia` composite switch installs the desktop-shell stack (Hyprland +
+Caelestia Shell — replaces waybar/dunst/walker/matugen/satty/hyprlock/
+hypridle/hyprpaper/elephant), plus per-tool switches (`onedrive`, `flatpak`,
+`obsidian`, `docker`). `false` skips that tool's files **and** packages.
+Toggling a switch re-runs the desktop installer on next apply (it re-renders
+with the new package list) and re-prompts.
 
 **Decision 3 — package prompts, interactive:** during apply, each package
 script asks `[y/N]`. Say N to skip that set. Nothing installs silently.
@@ -71,7 +73,8 @@ chezmoi update    # git pull + apply (get upstream changes)
 ```
 
 - Toggle a desktop switch → `chezmoi apply` adds/removes its files and
-  re-runs the installer.
+  re-runs the installer (the `caelestia` switch re-renders the desktop
+  run_once script → new checksum → re-prompt).
 - Per-host secrets (`~/.bashrc.d/secrets.sh`, …) are never in this repo —
   create them directly on the machine; they're sourced if present.
 - Dev-only, when editing this repo locally:
