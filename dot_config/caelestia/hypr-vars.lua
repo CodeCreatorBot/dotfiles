@@ -5,5 +5,5 @@
 -- is built. Key names must match hypr/variables.lua upstream.
 return {
   terminal = "ghostty",
-  browser  = "zen",
+  browser  = "zen-browser",
 }
