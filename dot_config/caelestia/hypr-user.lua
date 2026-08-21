@@ -15,11 +15,11 @@ hl.config({
 	},
 })
 
--- Web apps (zen --new-window); keybinds that don't clash with caelestia defaults
-hl.bind("SUPER + SHIFT + E", hl.dsp.exec_cmd('zen --new-window "https://gmail.com"'))
-hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd('zen --new-window "https://github.com"'))
-hl.bind("SUPER + SHIFT + A", hl.dsp.exec_cmd('zen --new-window "https://hermes.amisra.net"'))
-hl.bind("SUPER + SHIFT + ALT + N", hl.dsp.exec_cmd('zen --new-window "https://netflix.com"'))
+-- Web apps (zen-browser --new-window); keybinds that don't clash with caelestia defaults
+hl.bind("SUPER + SHIFT + E", hl.dsp.exec_cmd('zen-browser --new-window "https://gmail.com"'))
+hl.bind("SUPER + SHIFT + R", hl.dsp.exec_cmd('zen-browser --new-window "https://github.com"'))
+hl.bind("SUPER + SHIFT + A", hl.dsp.exec_cmd('zen-browser --new-window "https://hermes.amisra.net"'))
+hl.bind("SUPER + SHIFT + ALT + N", hl.dsp.exec_cmd('zen-browser --new-window "https://netflix.com"'))
 
 -- Media apps
 hl.bind("SUPER + SHIFT + V", hl.dsp.exec_cmd("flatpak run com.stremio.Stremio"))

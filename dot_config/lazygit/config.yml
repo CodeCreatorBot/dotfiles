@@ -1,0 +1,8 @@
+customCommands:
+  # Generate a conventional commit message (subject + short body) from the
+  # staged diff using opencode's non-interactive CLI on a cheap OpenRouter
+  # model, then commit directly (no editor). Ctrl+a in the files panel.
+  - key: "<c-a>"
+    context: "files"
+    description: "Generate AI commit message (opencode)"
+    command: 'dir="$(git rev-parse --show-toplevel)" && msg="$(git -C "$dir" diff --cached | opencode run -m "openrouter/deepseek/deepseek-chat" "Generate a conventional git commit message from this staged diff. Produce a single short subject line (format: type: concise summary, max 72 chars) followed by a few bullet points describing what changed and why. Output ONLY the raw commit message with no markdown code fences and no preamble.")" && git -C "$dir" commit -m "$msg"'

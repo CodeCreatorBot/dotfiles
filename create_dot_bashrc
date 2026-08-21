@@ -1,7 +1,11 @@
-# ~/.bash_profile — sources ~/.bash.d/*.sh (chezmoi-managed) and per-host files.
+# ~/.bashrc
 
 # If not running interactively, don't do anything
 [[ $- != *i* ]] && return
+
+alias ls='ls --color=auto'
+alias grep='grep --color=auto'
+PS1='[\u@\h \W]\$ '
 
 # Folder-based loading: aliases.sh, env.sh, functions.sh are managed by
 # chezmoi; secrets.sh and local.sh are per-host and never tracked — create
