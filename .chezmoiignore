@@ -8,7 +8,6 @@
 AGENTS.md
 .config/AGENTS.md
 LICENSE
-PLAN.md
 README.md
 .pre-commit-config.yaml
 tests/**
@@ -42,6 +41,7 @@ docs/caelestia-cachyos-quickshell-fix.md
 {{ if ne (.env | default "dev") "desktop" }}
 .config/caelestia/**
 .config/obsidian/**
+.bash_d/colors.sh
 {{ end }}
 
 # ── Desktop hand-offs to caelestia (env = desktop) ──
