@@ -34,6 +34,8 @@ arch:
         - hyprpolkitagent
         - qt5-wayland
         - qt6-wayland
+        - sddm
+        - plymouth
       aur:
         - caelestia-cli
         - caelestia-shell
