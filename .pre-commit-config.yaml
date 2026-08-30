@@ -40,14 +40,17 @@ repos:
     hooks:
       - id: gitleaks
 
-  # Chezmoi-specific: every changed .tmpl must still render with the real
-  # config. Catches template syntax errors and missing data keys (chezmoi
-  # uses missingkey=error) that no formatter could catch.
+  # Chezmoi-specific: every changed .tmpl must still render. Catches template
+  # syntax errors and missing data keys (chezmoi uses missingkey=error) that
+  # no formatter could catch. The config template needs --init (init-only
+  # prompt* functions; --init skips .chezmoidata, so the pairs supply the
+  # defaults — keep in sync with .chezmoi.toml.tmpl prompts); all other
+  # templates render with the real config data.
   - repo: local
     hooks:
       - id: chezmoi-render
         name: chezmoi-render (templates compile)
-        entry: bash -c 'for f in "$@"; do chezmoi execute-template < "$f" >/dev/null || exit 1; done'
+        entry: bash -c 'for f in "$@"; do if [ "${f##*/}" = ".chezmoi.toml.tmpl" ]; then chezmoi execute-template --init --promptString "Environment (dev / work-dev / desktop)=dev" --promptString "OneDrive sync directory=~/OneDrive" < "$f" >/dev/null || exit 1; else chezmoi execute-template < "$f" >/dev/null || exit 1; fi; done'
         language: system
         files: '\.tmpl$'
         verbose: true

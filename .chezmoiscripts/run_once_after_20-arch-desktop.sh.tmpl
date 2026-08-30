@@ -45,6 +45,24 @@ FLATPAKS=({{ range .arch.desktop.flatpak }}"{{ . }}" {{ end }})
 # AUR extras (desktop, always)
 PKG_AUR+=({{ range .arch.desktop.aurExtras }}"{{ . }}" {{ end }})
 
+# CachyOS ships cachyos/noctalia-qs (repo fork of quickshell) which hijacks
+# the quickshell-git dep of caelestia-shell and kills the shell — skip the
+# shell package on CachyOS; see docs/caelestia-cachyos-quickshell-fix.md.
+{{ if .caelestia }}
+CAELESTIA_SKIP_SHELL=false
+if [ -f /etc/os-release ] && grep -qi 'cachyos' /etc/os-release; then
+	echo "==> CachyOS detected: skipping caelestia-shell (quickshell fork hijack)"
+	echo "    after this run, follow docs/caelestia-cachyos-quickshell-fix.md"
+	CAELESTIA_SKIP_SHELL=true
+	for i in "${!PKG_AUR[@]}"; do
+		if [ "${PKG_AUR[$i]}" = "caelestia-shell" ]; then
+			unset 'PKG_AUR[$i]'
+		fi
+	done
+	PKG_AUR=("${PKG_AUR[@]}")
+fi
+{{ end }}
+
 # base-devel is needed to build AUR packages
 if [ ${#PKG_AUR[@]} -gt 0 ]; then
 	PKG_PACMAN+=(base-devel)
@@ -71,7 +89,15 @@ if [ ${#GROUPS_ADD[@]} -gt 0 ]; then
 	echo "  groups (add $USER):      ${GROUPS_ADD[*]}"
 fi
 if [ ${#PKG_AUR[@]} -gt 0 ]; then
-	echo "  caelestia shell: comes in via AUR (caelestia-cli + caelestia-shell)"
+{{ if .caelestia }}
+	if $CAELESTIA_SKIP_SHELL; then
+		echo "  caelestia:    CLI only (CachyOS) — shell: see docs/caelestia-cachyos-quickshell-fix.md"
+	else
+{{ end }}
+		echo "  caelestia shell: comes in via AUR (caelestia-cli + caelestia-shell)"
+{{ if .caelestia }}
+	fi
+{{ end }}
 fi
 echo
 read -rp "Install the above? [y/N] " yn
@@ -112,6 +138,12 @@ if [ ${#PKG_AUR[@]} -gt 0 ] && command -v caelestia >/dev/null 2>&1; then
 		caelestia scheme set -n caelestia || echo "    (deferred — run 'caelestia scheme set -n caelestia' in-session)"
 	fi
 	echo "==> caelestia: shell + cli installed."
+{{ if .caelestia }}
+	if $CAELESTIA_SKIP_SHELL; then
+		echo "    (CachyOS: caelestia-shell skipped — quickshell fork hijack;"
+		echo "     follow docs/caelestia-cachyos-quickshell-fix.md)"
+	fi
+{{ end }}
 	echo "    Hand over the desktop visuals in your Wayland session:"
 	echo "      caelestia install   # select ONLY the 'hypr' component!"
 	echo "    (Other components overwrite chezmoi-managed files, e.g."
