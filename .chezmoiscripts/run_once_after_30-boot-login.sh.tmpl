@@ -22,6 +22,7 @@ sudo plymouth-set-default-theme -R omarchy
 # ── sddm: install theme + one drop-in (theme + autologin) + enable ──
 sudo install -d /usr/share/sddm/themes/omarchy /etc/sddm.conf.d
 sudo cp -a "$HOME/.local/share/sddm/themes/omarchy/." /usr/share/sddm/themes/omarchy/
+sudo install -m 644 "$HOME/.local/share/plymouth/themes/omarchy/archlinux.png" /usr/share/sddm/themes/omarchy/archlinux.png
 sudo tee /etc/sddm.conf.d/10-omarchy.conf >/dev/null <<EOF
 [Theme]
 Current=omarchy

@@ -3,11 +3,21 @@
 Window.SetBackgroundTopColor(0.101, 0.105, 0.149);
 Window.SetBackgroundBottomColor(0.101, 0.105, 0.149);
 
-logo.image = Image("logo.png");
-logo.sprite = Sprite(logo.image);
-logo.sprite.SetX(Window.GetWidth() / 2 - logo.image.GetWidth() / 2);
-logo.sprite.SetY(Window.GetHeight() / 2 - logo.image.GetHeight() / 2);
-logo.sprite.SetOpacity(1);
+# Cover-fit fullscreen background (scales to the current window resolution)
+background.image = Image("archlinux.png");
+screen_ratio = Window.GetHeight() / Window.GetWidth();
+background_ratio = background.image.GetHeight() / background.image.GetWidth();
+if (screen_ratio > background_ratio) {
+  scale_factor = Window.GetHeight() / background.image.GetHeight();
+} else {
+  scale_factor = Window.GetWidth() / background.image.GetWidth();
+}
+scaled_background = background.image.Scale(Math.Int(background.image.GetWidth() * scale_factor), Math.Int(background.image.GetHeight() * scale_factor));
+background.sprite = Sprite(scaled_background);
+background.sprite.SetPosition(Window.GetX() + Window.GetWidth() / 2 - scaled_background.GetWidth() / 2,
+                              Window.GetY() + Window.GetHeight() / 2 - scaled_background.GetHeight() / 2,
+                              -10000);
+background.sprite.SetOpacity(1);
 
 # Use these to adjust the progress bar timing
 global.fake_progress_limit = 0.7;  # Target percentage for fake progress (0.0 to 1.0)
@@ -109,7 +119,7 @@ bullet.image = Image("bullet.png");
 
 entry.sprite = Sprite(entry.image);
 entry.x = Window.GetWidth() / 2 - entry.image.GetWidth() / 2;
-entry.y = logo.sprite.GetY() + logo.image.GetHeight() + 40;
+entry.y = Window.GetHeight() / 2 - entry.image.GetHeight() / 2;
 entry.sprite.SetPosition(entry.x, entry.y, 10001);
 entry.sprite.SetOpacity(0);
 

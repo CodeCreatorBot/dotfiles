@@ -3,8 +3,9 @@ import SddmComponents 2.0
 
 Rectangle {
   id: root
-  width: 640
-  height: 480
+  property variant geometry: screenModel.geometry(screenModel.primary)
+  width: geometry.width
+  height: geometry.height
   color: "#1a1b26"
 
   property string currentUser: userModel.lastUser
@@ -30,18 +31,16 @@ Rectangle {
     }
   }
 
+  Image {
+    anchors.fill: parent
+    source: "archlinux.png"
+    fillMode: Image.PreserveAspectCrop
+    clip: true
+  }
+
   Column {
     anchors.centerIn: parent
     spacing: 40
-
-    Image {
-      id: logo
-      source: "logo.png"
-      width: Math.min(sourceSize.width, root.width * 0.8)
-      height: sourceSize.width > 0 ? Math.round(width * sourceSize.height / sourceSize.width) : 0
-      fillMode: Image.PreserveAspectFit
-      anchors.horizontalCenter: parent.horizontalCenter
-    }
 
     Row {
       anchors.horizontalCenter: parent.horizontalCenter
