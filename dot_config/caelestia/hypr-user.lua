@@ -26,7 +26,21 @@ hl.bind("SUPER + SHIFT + V", hl.dsp.exec_cmd("flatpak run com.stremio.Stremio"))
 
 -- Laptops
 
-hl.monitor({ output = "eDP-1", scale = 1.5, position = "auto-left" })
+-- switch binds fire only on toggles, never on the initial state: read ACPI state
+-- once at startup so a boot with the lid already closed starts clamshell.
+local function lid_closed()
+	for _, lid in ipairs({ "LID0", "LID" }) do
+		local f = io.open("/proc/acpi/button/lid/" .. lid .. "/state")
+		if f then
+			local state = f:read("*a") or ""
+			f:close()
+			return state:find("closed") ~= nil
+		end
+	end
+	return false
+end
+
+hl.monitor({ output = "eDP-1", scale = 1.5, position = "auto-left", disabled = lid_closed() })
 
 -- switch:off = closed on this machine; some firmware report reversed (swap on/off).
 -- Lid Closed Event
