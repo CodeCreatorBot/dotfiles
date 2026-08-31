@@ -36,3 +36,7 @@ toolchains:
       url: https://astral.sh/uv/install.sh
       sh: sh
       post: uv python install && uv tool install ruff
+    - name: dbt
+      url: https://public.cdn.getdbt.com/fs/install/install.sh
+      sh: sh -s -- --update
+      post: ""

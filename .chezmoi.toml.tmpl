@@ -1,29 +1,35 @@
 # Environment selector — the single toggle that decides what gets applied.
-# `chezmoi init` generates this once; edit freely afterwards (re-run
-# `chezmoi init` ONLY if the upstream template changes).
+# `chezmoi init` generates this once, asking env; edit freely afterwards
+# (re-run `chezmoi init` ONLY if the upstream template changes — existing
+# answers are reused, no re-prompt).
 #
 #   dev       dev tooling + all toolchains (everything on, no switches)
 #   work-dev  dev + Azure DevOps / corporate work tooling (Windows files
 #             additionally require a Windows OS)
 #   desktop   dev + desktop environment, tuned by the switches below
+{{- $env := promptStringOnce . "env" "Environment (dev / work-dev / desktop)" "dev" }}
 
 [data]
-env = "desktop"
+env = {{ $env | quote }}
 
-# ── Variables ──
-ONEDRIVE_DIR = "/mnt/hdd/OneDrive"
-
-# ── opencode optional bundles (any env, opt-in, default OFF) ──
-# Flip on to deploy the playwright agents + cli skill.
-opencode_playwright = false
-
+{{ if eq $env "desktop" }}
 # ── Desktop switches (only used when env = "desktop") ──
 # Gate both file deployment (chezmoi) and package installs (bootstrap).
 # caelestia is the desktop-shell composite (replaces waybar, dunst, walker,
 # matugen, satty, hyprlock/hypridle/hyprpaper, elephant); the per-tool
 # switches below survive independently of it.
-caelestia = true
-onedrive = true
-flatpak = true
-obsidian = true
-docker = true
+caelestia = false
+# OneDrive sync dir (used only when the onedrive switch is on).
+ONEDRIVE_DIR = "~/OneDrive"
+onedrive = false
+flatpak = false
+obsidian = false
+docker = false
+# Fingerprint login (FW13 Goodix reader) — script self-gates on lsusb,
+# so true is inert on desktop hosts without the reader.
+fprint = false
+{{ end }}
+
+# ── opencode optional bundles (any env, opt-in, default OFF) ──
+# Flip on to deploy the playwright agents + cli skill.
+opencode_playwright = false

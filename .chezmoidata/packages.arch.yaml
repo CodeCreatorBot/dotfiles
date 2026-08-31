@@ -34,6 +34,8 @@ arch:
         - hyprpolkitagent
         - qt5-wayland
         - qt6-wayland
+        - sddm
+        - plymouth
       aur:
         - caelestia-cli
         - caelestia-shell
@@ -51,6 +53,11 @@ arch:
     onedrive:
       aur:
         - onedrive-abraunegg
+    # Fingerprint login (FW13 AMD Goodix 27c6:609c — native libfprint
+    # goodixmoc driver). PAM + wake workaround: run_once_after_40-fprintd.
+    fprint:
+      pacman:
+        - fprintd
     flatpak:
       - com.stremio.Stremio
       - com.github.geigi.cozy
