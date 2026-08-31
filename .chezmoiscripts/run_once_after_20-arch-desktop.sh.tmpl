@@ -38,6 +38,9 @@ GROUPS_ADD+=({{ range .arch.desktop.docker.groups }}"{{ . }}" {{ end }})
 {{ if .onedrive }}
 PKG_AUR+=({{ range .arch.desktop.onedrive.aur }}"{{ . }}" {{ end }})
 {{ end }}
+{{ if .fprint }}
+PKG_PACMAN+=({{ range .arch.desktop.fprint.pacman }}"{{ . }}" {{ end }})
+{{ end }}
 {{ if .flatpak }}
 FLATPAKS=({{ range .arch.desktop.flatpak }}"{{ . }}" {{ end }})
 {{ end }}

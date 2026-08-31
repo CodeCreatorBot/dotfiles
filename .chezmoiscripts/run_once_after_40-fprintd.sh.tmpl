@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# Fingerprint login (run_once_after_40) — FW13 AMD Goodix 27c6:609c.
+#
+# Native stack, no AUR: fprintd (installed by run_once_after_20) + libfprint's
+# goodixmoc driver. Adds `auth sufficient pam_fprintd.so` to sudo / sddm / tty
+# PAM (fingerprint first, password fallback) and vendors Framework's
+# Fingerprint-Wake-Workaround service (rebinds the xHCI controller after
+# suspend if the reader vanishes):
+#   https://github.com/FrameworkComputer/linux-docs/tree/main/Fingerprint-Wake-Workaround
+#
+# Prints are per-user secrets — never automated. The caelestia lock screen
+# picks the reader up natively once a print is enrolled (lock.enableFprint
+# defaults to true).
+{{- if or (ne (.env | default "dev") "desktop") (ne .chezmoi.os "linux") (not (.fprint | default false)) }}
+echo "Skip: needs env=desktop + linux + fprint"
+exit 0
+{{- else }}
+set -eu
+[ -f /etc/arch-release ] || { echo "Skip: not Arch"; exit 0; }
+
+# hardware gate: FW13 Goodix reader present?
+lsusb -d 27c6:609c >/dev/null 2>&1 || { echo "Skip: no Goodix 27c6:609c reader"; exit 0; }
+
+command -v fprintd-enroll >/dev/null 2>&1 || { echo "Skip: fprintd not installed"; exit 0; }
+
+# ── PAM: fingerprint first, password fallback (idempotent) ──────────────
+pam_add() {
+	local file="$1"
+	if [ ! -f "$file" ] || grep -q 'pam_fprintd' "$file"; then
+		return
+	fi
+	echo "==> PAM: add pam_fprintd to $file"
+	sudo sed -i '/^#%PAM-1.0/a auth       sufficient   pam_fprintd.so' "$file"
+}
+
+for f in sudo sddm system-local-login; do
+	pam_add "/etc/pam.d/$f"
+done
+
+# ── Framework wake workaround ────────────────────────────────────────────
+# The reader dies after suspend/resume (xhci fails to re-enumerate it); the
+# service rebinds its hosting PCI controller on wake. No-op when present.
+FPRINT_LINE=$(lsusb | grep '27c6:609c' | head -1)
+FPRINT_ID=$(echo "$FPRINT_LINE" | sed -nE 's/.*ID ([0-9a-f]{4}:[0-9a-f]{4}).*/\1/p')
+BUS=$(echo "$FPRINT_LINE" | awk '{print $2}')
+PCI_FUNC=$(readlink -f "/sys/bus/usb/devices/usb${BUS}" 2>/dev/null |
+	grep -oE '[0-9a-f]{4}:[0-9a-f]{2}:[0-9a-f]{2}\.[0-9]' | tail -1 || true)
+DRIVER_PATH=""
+if [ -n "$PCI_FUNC" ] && [ -L "/sys/bus/pci/devices/$PCI_FUNC/driver" ]; then
+	DRIVER_PATH="/sys/bus/pci/drivers/$(basename "$(readlink -f "/sys/bus/pci/devices/$PCI_FUNC/driver")")"
+fi
+
+if [ -n "$DRIVER_PATH" ]; then
+	echo "==> Wake workaround: reader $FPRINT_ID on $PCI_FUNC"
+	sudo install -d -m 755 /etc/local/bin
+	sudo tee /etc/local/bin/run-after-wake-for-fprint.sh >/dev/null <<EOF
+#!/bin/sh
+# Framework fingerprint wake fix — generated for $FPRINT_ID on $PCI_FUNC
+PCI_FUNC="$PCI_FUNC"
+FPRINT_ID="$FPRINT_ID"
+DRIVER_PATH="$DRIVER_PATH"
+
+logger -t fp-rebind "Checking fingerprint reader after wake"
+sleep 2
+if ! lsusb -d "\$FPRINT_ID" >/dev/null 2>&1; then
+  logger -t fp-rebind "Fingerprint missing, resetting controller \$PCI_FUNC"
+  echo "\$PCI_FUNC" >"\$DRIVER_PATH/unbind" 2>/dev/null || { logger -t fp-rebind "ERROR: unbind failed"; exit 1; }
+  sleep 1
+  echo "\$PCI_FUNC" >"\$DRIVER_PATH/bind" 2>/dev/null || { logger -t fp-rebind "ERROR: bind failed"; exit 1; }
+  sleep 2
+  systemctl try-restart fprintd.service
+  lsusb -d "\$FPRINT_ID" >/dev/null 2>&1 && logger -t fp-rebind "SUCCESS: reader restored" \
+    || logger -t fp-rebind "WARNING: reader still missing"
+else
+  logger -t fp-rebind "Reader present, no action needed"
+fi
+EOF
+	sudo chmod +x /etc/local/bin/run-after-wake-for-fprint.sh
+	sudo tee /etc/systemd/system/run-after-wake-for-fprint.service >/dev/null <<'EOF'
+[Unit]
+Description=Restore fingerprint reader after system resume
+After=suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target
+
+[Service]
+Type=oneshot
+ExecStart=/etc/local/bin/run-after-wake-for-fprint.sh
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target
+EOF
+	sudo systemctl daemon-reload
+	sudo systemctl enable run-after-wake-for-fprint.service
+else
+	echo "==> Wake workaround: could not resolve PCI controller for bus $BUS — skip"
+fi
+
+# ── enroll hint (prints are per-user; never automated) ──────────────────
+if ! fprintd-list "$USER" 2>/dev/null | grep -q "fingerprint"; then
+	echo "==> fprintd: enroll a finger (scan 5x):"
+	echo "    fprintd-enroll -f right-index-finger"
+	echo "    fprintd-list \"$USER\"        # verify"
+fi
+{{- end }}
