@@ -1,6 +1,8 @@
 onboarding = false
 [keys]
 prefix = "ctrl+space"
+# prefix+shift+g is repurposed for the lazygit tab below
+new_worktree = ""
 focus_pane_left = ["prefix+h", "alt+h"]
 focus_pane_down = ["prefix+j", "alt+j"]
 focus_pane_up = ["prefix+k", "alt+k"]
@@ -19,3 +21,23 @@ mouse_capture = false
 # automatically; elsewhere it follows the terminal default — no gating needed.
 [theme]
 name = "terminal"
+
+# Named-tab launchers: create + focus a tab, then submit the command in its
+# root pane. Runs detached with the focused pane's cwd; the new tab follows it.
+[[keys.command]]
+key = "prefix+shift+g"
+type = "shell"
+command = "herdr pane run \"$(herdr tab create --label lg --focus | jq -r .result.root_pane.pane_id)\" lazygit"
+description = "new tab 'lg': lazygit"
+
+[[keys.command]]
+key = "prefix+shift+a"
+type = "shell"
+command = "herdr pane run \"$(herdr tab create --label ai --focus | jq -r .result.root_pane.pane_id)\" opencode"
+description = "new tab 'ai': opencode"
+
+[[keys.command]]
+key = "prefix+shift+e"
+type = "shell"
+command = "herdr pane run \"$(herdr tab create --label nvim --focus | jq -r .result.root_pane.pane_id)\" 'nvim .'"
+description = "new tab 'nvim': nvim ."
