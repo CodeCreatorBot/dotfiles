@@ -57,10 +57,12 @@ installed: change it, run `chezmoi apply`, done.
 **Decision 2 — desktop switches (only when `env = "desktop"`):** a single
 `caelestia` composite switch installs the desktop-shell stack (Hyprland +
 Caelestia Shell — replaces waybar/dunst/walker/matugen/satty/hyprlock/
-hypridle/hyprpaper/elephant), plus per-tool switches (`onedrive`, `flatpak`,
-`obsidian`, `docker`). `false` skips that tool's files **and** packages.
-Toggling a switch re-runs the desktop installer on next apply (it re-renders
-with the new package list) and re-prompts.
+hypridle/hyprpaper/elephant), plus per-tool switches (`onedrive`,
+`obsidian`, `docker`) and one switch per optional application (`ai`,
+`stremio`, `audiobooks`, `bitwarden`, `grayjay`, `nordvpn` — apps are
+flags: opt-in, packages only). `false` skips that tool's files **and**
+packages. Toggling a switch re-runs the desktop installer on next apply
+(it re-renders with the new package list) and re-prompts.
 
 **Decision 3 — package prompts, interactive:** during apply, each package
 script asks `[y/N]`. Say N to skip that set. Nothing installs silently.

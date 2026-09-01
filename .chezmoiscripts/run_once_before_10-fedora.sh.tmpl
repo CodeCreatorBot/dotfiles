@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Fedora — dev packages + COPR + toolchains (run once, before dotfiles).
-# Package data: .chezmoidata/packages.fedora.yaml + packages.toolchains.yaml.
+# Package data: .chezmoidata/packages.fedora.yaml (fedora.dev.*) +
+# packages.toolchains.yaml (toolchains.dev.*). Shape: os.env.[flag].installer.
 # env={{ .env }}
 set -eu
 
@@ -14,8 +15,8 @@ fi
 
 # ── package lists ───────────────────────────────────────────────────────
 
-PKG_DNF=({{ range .fedora.dnf }}"{{ . }}" {{ end }})
-COPR=({{ range .fedora.copr }}"{{ .repo }}:{{ .pkgs }}" {{ end }})
+PKG_DNF=({{ range .fedora.dev.dnf }}"{{ . }}" {{ end }})
+COPR=({{ range .fedora.dev.copr }}"{{ .repo }}:{{ .pkgs }}" {{ end }})
 
 CURL_INSTALLERS=({{ range .toolchains.dev.curlInstallers }}"{{ .name }}|{{ .url }}|{{ .sh }}|{{ .post }}" {{ end }})
 

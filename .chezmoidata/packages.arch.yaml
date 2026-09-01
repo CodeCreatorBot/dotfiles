@@ -1,24 +1,27 @@
 # Arch Linux packages — consumed by run_once_before_10-arch.sh.tmpl
 # (dev + toolchains) and run_once_after_20-arch-desktop.sh.tmpl (desktop).
 #
-# Desktop packages are grouped BY SWITCH NAME. The switch VALUES live in
-# chezmoi.toml [data] (single source of truth — they also gate file
-# deployment in .chezmoiignore). This file only lists what each switch
-# installs.
+# Shape — os.env.[flag].installer = [packages] (flag optional):
+#   dev     → always-installed base, no flag: arch.dev.pacman
+#   desktop → switch-gated: arch.desktop.<flag>.<installer>
+# The flag VALUES live in chezmoi.toml [data] (single source of truth —
+# they also gate file deployment in .chezmoiignore). This file only lists
+# what each flag installs.
 arch:
   dev:
-    - neovim
-    - eza
-    - zoxide
-    - fzf
-    - starship
-    - ripgrep
-    - fd
-    - bat
-    - lazygit
-    - ghostty
-    - docker
-    - docker-compose
+    pacman:
+      - neovim
+      - eza
+      - zoxide
+      - fzf
+      - starship
+      - ripgrep
+      - fd
+      - bat
+      - lazygit
+      - ghostty
+      - docker
+      - docker-compose
 
   desktop:
     # Caelestia Shell (Quickshell-based desktop shell on top of Hyprland).
@@ -68,10 +71,18 @@ arch:
         - xrt-plugin-amdxdna
         - fastflowlm
         - lemonade-server
-    flatpak:
-      - com.stremio.Stremio
-      - com.github.geigi.cozy
-    aurExtras:
-      - bitwarden-bin
-      - grayjay-bin
-      - nordvpn-bin
+    stremio:
+      aur:
+        - com.stremio.Stremio
+    audiobooks:
+      aur:
+        - com.github.geigi.cozy
+    bitwarden:
+      aur:
+        - bitwarden-bin
+    grayjay:
+      aur:
+        - grayjay-bin
+    nordvpn:
+      aur:
+        - nordvpn-bin

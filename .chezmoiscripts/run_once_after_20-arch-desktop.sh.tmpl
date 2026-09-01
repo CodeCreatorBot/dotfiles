@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
 # Arch desktop layer — run once, AFTER dotfiles (run_once_after_).
 #
-# Switch-gated: packages come from .chezmoidata/packages.arch.yaml grouped
-# by switch name; switch VALUES come from chezmoi.toml [data]. Because the
-# template renders each enabled switch into the script, toggling a switch
-# in chezmoi.toml changes the rendered content → new checksum → this
-# script re-runs (and re-prompts). Desktop-only toolchains come from
-# packages.toolchains.yaml (toolchains.desktop.*). env={{ .env }}
+# Flag-gated: packages come from .chezmoidata/packages.arch.yaml as
+# arch.desktop.<flag>.<installer> (shape: os.env.[flag].installer); flag
+# VALUES come from chezmoi.toml [data]. The template walks every flag in
+# the data file and renders only the enabled ones — toggling a switch
+# changes the rendered content → new checksum → this script re-runs (and
+# re-prompts). Adding an app = YAML group + chezmoi.toml switch; no script
+# edit. Desktop toolchains come from packages.toolchains.yaml
+# (toolchains.desktop.*). env={{ .env }}
 {{- if or (ne (.env | default "dev") "desktop") (ne .chezmoi.os "linux") }}
 echo "Skip: env=desktop + Arch only"
 exit 0
@@ -16,7 +18,9 @@ set -eu
 # Self-gate: chezmoi runs every run_ script on every OS.
 [ -f /etc/arch-release ] || { echo "Skip: not Arch"; exit 0; }
 
-# ── collect packages (switch-gated) ─────────────────────────────────────
+# ── collect packages (flag-gated) ───────────────────────────────────────
+# Walk arch.desktop flags → bash arrays. Installer mapping:
+# pacman/aur/flatpak install; services/groups are post-install side effects.
 
 PKG_PACMAN=()
 PKG_AUR=()
@@ -24,30 +28,28 @@ FLATPAKS=()
 SERVICES_ENABLE=()
 GROUPS_ADD=()
 
-{{ if .caelestia }}
-PKG_PACMAN+=({{ range .arch.desktop.caelestia.pacman }}"{{ . }}" {{ end }})
-PKG_AUR+=({{ range .arch.desktop.caelestia.aur }}"{{ . }}" {{ end }})
-{{ end }}
-{{ if .obsidian }}
-PKG_PACMAN+=({{ range .arch.desktop.obsidian.pacman }}"{{ . }}" {{ end }})
-{{ end }}
-{{ if .docker }}
-PKG_PACMAN+=({{ range .arch.desktop.docker.pacman }}"{{ . }}" {{ end }})
-SERVICES_ENABLE+=({{ range .arch.desktop.docker.services }}"{{ . }}" {{ end }})
-GROUPS_ADD+=({{ range .arch.desktop.docker.groups }}"{{ . }}" {{ end }})
-{{ end }}
-{{ if .onedrive }}
-PKG_AUR+=({{ range .arch.desktop.onedrive.aur }}"{{ . }}" {{ end }})
-{{ end }}
-{{ if .fprint }}
-PKG_PACMAN+=({{ range .arch.desktop.fprint.pacman }}"{{ . }}" {{ end }})
-{{ end }}
-{{ if .flatpak }}
-FLATPAKS=({{ range .arch.desktop.flatpak }}"{{ . }}" {{ end }})
-{{ end }}
-
-# AUR extras (desktop, always)
-PKG_AUR+=({{ range .arch.desktop.aurExtras }}"{{ . }}" {{ end }})
+{{ range $flag, $entry := .arch.desktop -}}
+{{- if not (hasKey $ $flag) }}
+echo "WARN: '{{ $flag }}' is in packages.arch.yaml but has no chezmoi.toml switch — skipped"
+{{- else if index $ $flag }}
+	# {{ $flag }}
+{{- range $inst, $pkgs := $entry -}}
+{{- if eq $inst "pacman" }}
+PKG_PACMAN+=({{ range $pkgs }}"{{ . }}" {{ end }})
+{{- else if eq $inst "aur" }}
+PKG_AUR+=({{ range $pkgs }}"{{ . }}" {{ end }})
+{{- else if eq $inst "flatpak" }}
+FLATPAKS+=({{ range $pkgs }}"{{ . }}" {{ end }})
+{{- else if eq $inst "services" }}
+SERVICES_ENABLE+=({{ range $pkgs }}"{{ . }}" {{ end }})
+{{- else if eq $inst "groups" }}
+GROUPS_ADD+=({{ range $pkgs }}"{{ . }}" {{ end }})
+{{- else }}
+echo "WARN: '{{ $flag }}': unknown installer '{{ $inst }}' — skipped"
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
 
 # Desktop toolchains (desktop, always — from packages.toolchains.yaml)
 CURL_INSTALLERS=({{ range .toolchains.desktop.curlInstallers }}"{{ .name }}|{{ .url }}|{{ .sh }}|{{ .post }}" {{ end }})
@@ -56,8 +58,8 @@ VOLTA_TOOLS=({{ range .toolchains.desktop.voltaTools }}"{{ .tool }}" {{ end }})
 # CachyOS ships cachyos/noctalia-qs (repo fork of quickshell) which hijacks
 # the quickshell-git dep of caelestia-shell and kills the shell — skip the
 # shell package on CachyOS; see docs/caelestia-cachyos-quickshell-fix.md.
-{{ if .caelestia }}
 CAELESTIA_SKIP_SHELL=false
+{{ if index . "caelestia" }}
 if [ -f /etc/os-release ] && grep -qi 'cachyos' /etc/os-release; then
 	echo "==> CachyOS detected: skipping caelestia-shell (quickshell fork hijack)"
 	echo "    after this run, follow docs/caelestia-cachyos-quickshell-fix.md"
@@ -90,6 +92,12 @@ fi
 if [ ${#FLATPAKS[@]} -gt 0 ]; then
 	echo "  flatpak: ${FLATPAKS[*]}"
 fi
+if [ ${#SERVICES_ENABLE[@]} -gt 0 ]; then
+	echo "  services (enable --now): ${SERVICES_ENABLE[*]}"
+fi
+if [ ${#GROUPS_ADD[@]} -gt 0 ]; then
+	echo "  groups (add $USER):      ${GROUPS_ADD[*]}"
+fi
 if [ ${#CURL_INSTALLERS[@]} -gt 0 ]; then
 	for entry in "${CURL_INSTALLERS[@]}"; do
 		IFS='|' read -r name url interpreter post <<<"$entry"
@@ -100,23 +108,6 @@ if [ ${#CURL_INSTALLERS[@]} -gt 0 ]; then
 fi
 if [ ${#VOLTA_TOOLS[@]} -gt 0 ]; then
 	echo "  volta:   ${VOLTA_TOOLS[*]}"
-fi
-if [ ${#SERVICES_ENABLE[@]} -gt 0 ]; then
-	echo "  services (enable --now): ${SERVICES_ENABLE[*]}"
-fi
-if [ ${#GROUPS_ADD[@]} -gt 0 ]; then
-	echo "  groups (add $USER):      ${GROUPS_ADD[*]}"
-fi
-if [ ${#PKG_AUR[@]} -gt 0 ]; then
-{{ if .caelestia }}
-	if $CAELESTIA_SKIP_SHELL; then
-		echo "  caelestia:    CLI only (CachyOS) — shell: see docs/caelestia-cachyos-quickshell-fix.md"
-	else
-{{ end }}
-		echo "  caelestia shell: comes in via AUR (caelestia-cli + caelestia-shell)"
-{{ if .caelestia }}
-	fi
-{{ end }}
 fi
 echo
 read -rp "Install the above? [y/N] " yn
@@ -151,18 +142,16 @@ fi
 
 # ── caelestia (post-install) ─────────────────────────────────────────────
 
-if [ ${#PKG_AUR[@]} -gt 0 ] && command -v caelestia >/dev/null 2>&1; then
+if command -v caelestia >/dev/null 2>&1; then
 	if [ ! -f "${XDG_STATE_HOME:-$HOME/.local/state}/caelestia/scheme.json" ]; then
 		echo "==> caelestia: create default scheme"
 		caelestia scheme set -n caelestia || echo "    (deferred — run 'caelestia scheme set -n caelestia' in-session)"
 	fi
 	echo "==> caelestia: shell + cli installed."
-{{ if .caelestia }}
 	if $CAELESTIA_SKIP_SHELL; then
 		echo "    (CachyOS: caelestia-shell skipped — quickshell fork hijack;"
 		echo "     follow docs/caelestia-cachyos-quickshell-fix.md)"
 	fi
-{{ end }}
 	echo "    Hand over the desktop visuals in your Wayland session:"
 	echo "      caelestia install   # select ONLY the 'hypr' component!"
 	echo "    (Other components overwrite chezmoi-managed files, e.g."

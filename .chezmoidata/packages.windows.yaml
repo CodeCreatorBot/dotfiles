@@ -2,5 +2,6 @@
 # (env = work-dev only). posh-git is loaded in the PowerShell profile,
 # not installed here.
 windows:
-  winget:
-    - Alacritty.Alacritty
+  work-dev:
+    winget:
+      - Alacritty.Alacritty

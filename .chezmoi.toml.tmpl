@@ -22,12 +22,22 @@ caelestia = false
 # OneDrive sync dir (used only when the onedrive switch is on).
 ONEDRIVE_DIR = "~/OneDrive"
 onedrive = false
-flatpak = false
 obsidian = false
 docker = false
 # Fingerprint login (FW13 Goodix reader) — script self-gates on lsusb,
 # so true is inert on desktop hosts without the reader.
 fprint = false
+
+# ── Applications (one switch per app/stack; packages only) ──
+# Each maps to a same-named group in .chezmoidata/packages.arch.yaml
+# (arch.desktop.<flag>.<installer>) and is installed on next apply.
+# No dotfiles to gate — no .chezmoiignore entries needed.
+ai = false
+stremio = false
+audiobooks = false
+bitwarden = false
+grayjay = false
+nordvpn = false
 {{ end }}
 
 # ── opencode optional bundles (any env, opt-in, default OFF) ──

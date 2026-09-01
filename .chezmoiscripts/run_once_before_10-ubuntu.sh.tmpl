@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Ubuntu — dev packages + toolchains (run once, before dotfiles).
-# Package data: .chezmoidata/packages.ubuntu.yaml + packages.toolchains.yaml.
+# Package data: .chezmoidata/packages.ubuntu.yaml (ubuntu.dev.apt) +
+# packages.toolchains.yaml (toolchains.dev.*). Shape: os.env.[flag].installer.
 # env={{ .env }}
 set -eu
 
@@ -14,7 +15,7 @@ fi
 
 # ── package lists ───────────────────────────────────────────────────────
 
-PKG_APT=({{ range .ubuntu.apt }}"{{ . }}" {{ end }})
+PKG_APT=({{ range .ubuntu.dev.apt }}"{{ . }}" {{ end }})
 
 CURL_INSTALLERS=({{ range .toolchains.dev.curlInstallers }}"{{ .name }}|{{ .url }}|{{ .sh }}|{{ .post }}" {{ end }})
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Arch — dev packages + toolchains (run once, before dotfiles).
-# Package data: .chezmoidata/packages.arch.yaml + packages.toolchains.yaml.
+# Package data: .chezmoidata/packages.arch.yaml (arch.dev.pacman) +
+# packages.toolchains.yaml (toolchains.dev.*). Shape: os.env.[flag].installer.
 # env={{ .env }}
 set -eu
 
@@ -9,7 +10,7 @@ set -eu
 
 # ── package lists ───────────────────────────────────────────────────────
 
-PKG_PACMAN=({{ range .arch.dev }}"{{ . }}" {{ end }})
+PKG_PACMAN=({{ range .arch.dev.pacman }}"{{ . }}" {{ end }})
 
 CURL_INSTALLERS=({{ range .toolchains.dev.curlInstallers }}"{{ .name }}|{{ .url }}|{{ .sh }}|{{ .post }}" {{ end }})
 

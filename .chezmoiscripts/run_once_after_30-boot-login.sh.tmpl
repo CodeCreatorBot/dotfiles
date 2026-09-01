@@ -5,7 +5,7 @@
 # sddm auto-logs into Hyprland (greeter only on logout/lock). Themes are
 # chezmoi-managed at ~/.local/share/{plymouth,sddm}/themes/omarchy — edit
 # those and re-sync to /usr/share to see changes.
-{{- if or (ne (.env | default "dev") "desktop") (ne .chezmoi.os "linux") (not (.caelestia | default false)) }}
+{{- if or (ne (.env | default "dev") "desktop") (ne .chezmoi.os "linux") (not (index . "caelestia")) }}
 echo "Skip: needs env=desktop + linux + caelestia"
 exit 0
 {{- else }}

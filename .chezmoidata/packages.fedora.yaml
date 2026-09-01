@@ -1,17 +1,18 @@
 # Fedora packages — consumed by run_once_before_10-fedora.sh.tmpl.
 # lazygit + ghostty come from COPR, not the default repos.
 fedora:
-  dnf:
-    - neovim
-    - eza
-    - zoxide
-    - fzf
-    - ripgrep
-    - fd-find
-    - bat
-    - tmux
-    - docker
-    - docker-compose
-  copr:
-    - { repo: atim/lazygit, pkgs: "lazygit" }
-    - { repo: scottames/ghostty, pkgs: "ghostty" }
+  dev:
+    dnf:
+      - neovim
+      - eza
+      - zoxide
+      - fzf
+      - ripgrep
+      - fd-find
+      - bat
+      - tmux
+      - docker
+      - docker-compose
+    copr:
+      - { repo: atim/lazygit, pkgs: "lazygit" }
+      - { repo: scottames/ghostty, pkgs: "ghostty" }
