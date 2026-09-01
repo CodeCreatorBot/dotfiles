@@ -15,4 +15,4 @@
 check_nomount = "true"
 check_nosync = "true"
 skip_dir = "Pictures"
-sync_dir = {{ .ONEDRIVE_DIR | default "~/OneDrive" | quote }}
+sync_dir = {{ if hasKey . "ONEDRIVE_DIR" }}{{ .ONEDRIVE_DIR | quote }}{{ else }}"~/OneDrive"{{ end }}

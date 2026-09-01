@@ -9,7 +9,7 @@ elif grep -qs '^ID=ubuntu' /etc/os-release; then
 	echo "==> Configuring Ubuntu..."
 	export DEBIAN_FRONTEND=noninteractive
 	apt-get update
-	apt-get install -y git curl sudo ca-certificates
+	apt-get install -y git curl sudo ca-certificates bsdextrautils
 elif [ -f /etc/arch-release ]; then
 	echo "==> Configuring Arch..."
 	pacman -Sy --noconfirm git curl sudo base-devel
@@ -36,11 +36,8 @@ sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
 mkdir -p "$HOME/.local/share"
 cp -r /repo "$HOME/.local/share/chezmoi"
 
-# Init chezmoi
-chezmoi init
-
-# Change env to dev
-sed -i 's/env = "desktop"/env = "dev"/g' "$HOME/.config/chezmoi/chezmoi.toml"
+# Init chezmoi non-interactively; --promptString is keyed by prompt text
+chezmoi init --promptString 'Environment (dev / work-dev / desktop)=dev'
 
 # Run apply
 echo "y" | chezmoi apply -v
