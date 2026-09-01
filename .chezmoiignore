@@ -65,3 +65,9 @@ docs/caelestia-cachyos-quickshell-fix.md
 {{ if and (eq (.env | default "dev") "desktop") (not (.obsidian | default false)) }}
 .config/obsidian/**
 {{ end }}
+
+# ── Local AI stack (env = desktop, ai switch) ──
+{{ if and (eq (.env | default "dev") "desktop") (not (.ai | default false)) }}
+.config/systemd/user/screenpipe.service
+.config/ai/**
+{{ end }}

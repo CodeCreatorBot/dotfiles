@@ -1,0 +1,14 @@
+[Unit]
+Description=AI screen capture (screenpipe: frames + text, no audio)
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+ExecCondition=/usr/bin/test -x %h/.volta/bin/screenpipe
+Environment=PATH=%h/.volta/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin
+ExecStart=%h/.volta/bin/screenpipe record --disable-audio --disable-telemetry --disable-keyboard-capture --disable-clipboard-capture --disable-meeting-detector --retention-days 30 --retention-mode media
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=graphical-session.target

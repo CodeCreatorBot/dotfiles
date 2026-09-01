@@ -1,0 +1,27 @@
+# AI stack config — rendered by chezmoi (ai switch, env=desktop).
+# Consumed by ~/.local/bin/ai/* scripts via python3 tomllib.
+vault_dir = "{{ .chezmoi.homeDir }}/obsidian/{{ .chezmoi.hostname }}-ai-notes"
+state_dir = "{{ .chezmoi.homeDir }}/.local/state/ai"
+recordings_dir = "{{ .chezmoi.homeDir }}/.local/state/ai/calls"
+
+# Local endpoints (never leave the machine by default).
+screenpipe_url = "http://127.0.0.1:3030"
+lemond_url = "http://127.0.0.1:13305"
+
+# NPU models (FastFlowLM via lemond; lazy-loaded).
+model_llm = "qwen3-it-4b-FLM"
+model_asr = "whisper-v3-turbo-FLM"
+model_embed = "embed-gemma-300m-FLM"
+llm_ctx = 8192
+
+# Mic for ai record (pw-record target by PulseAudio/ALSA name).
+# mic_source = "alsa_input.pci-0000_c1_00.6.HiFi__Mic1__source"
+# min_record_secs = 45
+
+[chunks]
+vault_size = 1500
+vault_overlap = 150
+screen_size = 800
+screen_overlap = 100
+top_k = 16
+max_retrieve = 4000
