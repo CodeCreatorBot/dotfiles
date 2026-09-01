@@ -64,18 +64,20 @@ arch:
     # Local AI stack (NPU-only) — inference stays on the XDNA2 NPU via
     # lemonade-server + FastFlowLM; no ollama/GPU inference by design.
     # (screenpipe recording is a volta tool: toolchains.desktop.voltaTools
-    # in packages.toolchains.yaml, installed by run_once_after_20-arch.)
+    # in packages.toolchains.yaml, installed by run_once_after_20-arch-desktop;
+    # openblas is a runtime dep of the npm cli-linux-x64 binary).
     ai:
       pacman:
         - xrt
         - xrt-plugin-amdxdna
         - fastflowlm
         - lemonade-server
+        - openblas
     stremio:
-      aur:
+      flatpak:
         - com.stremio.Stremio
     audiobooks:
-      aur:
+      flatpak:
         - com.github.geigi.cozy
     bitwarden:
       aur:
