@@ -17,7 +17,7 @@ fi
 PKG_DNF=({{ range .fedora.dnf }}"{{ . }}" {{ end }})
 COPR=({{ range .fedora.copr }}"{{ .repo }}:{{ .pkgs }}" {{ end }})
 
-CURL_INSTALLERS=({{ range .toolchains.curlInstallers }}"{{ .name }}|{{ .url }}|{{ .sh }}|{{ .post }}" {{ end }})
+CURL_INSTALLERS=({{ range .toolchains.dev.curlInstallers }}"{{ .name }}|{{ .url }}|{{ .sh }}|{{ .post }}" {{ end }})
 
 # ── confirmation ────────────────────────────────────────────────────────
 

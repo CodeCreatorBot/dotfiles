@@ -58,6 +58,16 @@ arch:
     fprint:
       pacman:
         - fprintd
+    # Local AI stack (NPU-only) — inference stays on the XDNA2 NPU via
+    # lemonade-server + FastFlowLM; no ollama/GPU inference by design.
+    # (screenpipe recording is a volta tool: toolchains.desktop.voltaTools
+    # in packages.toolchains.yaml, installed by run_once_after_20-arch.)
+    ai:
+      pacman:
+        - xrt
+        - xrt-plugin-amdxdna
+        - fastflowlm
+        - lemonade-server
     flatpak:
       - com.stremio.Stremio
       - com.github.geigi.cozy

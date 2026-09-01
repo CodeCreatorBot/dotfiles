@@ -5,7 +5,8 @@
 # by switch name; switch VALUES come from chezmoi.toml [data]. Because the
 # template renders each enabled switch into the script, toggling a switch
 # in chezmoi.toml changes the rendered content → new checksum → this
-# script re-runs (and re-prompts). env={{ .env }}
+# script re-runs (and re-prompts). Desktop-only toolchains come from
+# packages.toolchains.yaml (toolchains.desktop.*). env={{ .env }}
 {{- if or (ne (.env | default "dev") "desktop") (ne .chezmoi.os "linux") }}
 echo "Skip: env=desktop + Arch only"
 exit 0
@@ -48,6 +49,10 @@ FLATPAKS=({{ range .arch.desktop.flatpak }}"{{ . }}" {{ end }})
 # AUR extras (desktop, always)
 PKG_AUR+=({{ range .arch.desktop.aurExtras }}"{{ . }}" {{ end }})
 
+# Desktop toolchains (desktop, always — from packages.toolchains.yaml)
+CURL_INSTALLERS=({{ range .toolchains.desktop.curlInstallers }}"{{ .name }}|{{ .url }}|{{ .sh }}|{{ .post }}" {{ end }})
+VOLTA_TOOLS=({{ range .toolchains.desktop.voltaTools }}"{{ .tool }}" {{ end }})
+
 # CachyOS ships cachyos/noctalia-qs (repo fork of quickshell) which hijacks
 # the quickshell-git dep of caelestia-shell and kills the shell — skip the
 # shell package on CachyOS; see docs/caelestia-cachyos-quickshell-fix.md.
@@ -84,6 +89,17 @@ if [ ${#PKG_AUR[@]} -gt 0 ]; then
 fi
 if [ ${#FLATPAKS[@]} -gt 0 ]; then
 	echo "  flatpak: ${FLATPAKS[*]}"
+fi
+if [ ${#CURL_INSTALLERS[@]} -gt 0 ]; then
+	for entry in "${CURL_INSTALLERS[@]}"; do
+		IFS='|' read -r name url interpreter post <<<"$entry"
+		printf '  curl:    %s' "$name"
+		[ -n "$post" ] && printf ' (+ %s)' "$post"
+		echo
+	done
+fi
+if [ ${#VOLTA_TOOLS[@]} -gt 0 ]; then
+	echo "  volta:   ${VOLTA_TOOLS[*]}"
 fi
 if [ ${#SERVICES_ENABLE[@]} -gt 0 ]; then
 	echo "  services (enable --now): ${SERVICES_ENABLE[*]}"
@@ -168,6 +184,32 @@ if [ ${#FLATPAKS[@]} -gt 0 ]; then
 	echo "==> flatpak: ${FLATPAKS[*]}"
 	flatpak install -y flathub "${FLATPAKS[@]}"
 fi
+
+# ── desktop toolchains ──────────────────────────────────────────────────
+
+export VOLTA_HOME="$HOME/.volta"
+export PATH="$VOLTA_HOME/bin:$HOME/.local/bin:$PATH"
+
+set -o pipefail  # curl | sh failures must not be masked
+
+for entry in "${CURL_INSTALLERS[@]}"; do
+	IFS='|' read -r name url interpreter post <<<"$entry"
+	echo "==> $name"
+	if command -v "$name" >/dev/null 2>&1; then
+		echo "    already installed — skipping"
+	else
+		# shellcheck disable=SC2086
+		curl -fsSL "$url" | $interpreter
+	fi
+	if [ -n "$post" ]; then
+		sh -c "$post"
+	fi
+done
+
+for tool in "${VOLTA_TOOLS[@]}"; do
+	echo "==> volta install $tool"
+	volta install "$tool"
+done
 
 # ── services + groups ───────────────────────────────────────────────────
 

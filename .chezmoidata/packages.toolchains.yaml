@@ -3,40 +3,46 @@
 # Each entry installs via: curl -fsSL <url> | <sh>, then runs <post>.
 # git + chezmoi are prerequisites, not listed here.
 toolchains:
-  curlInstallers:
-    - name: starship
-      url: https://starship.rs/install.sh
-      sh: sh -s -- --yes
-      post: ""
-    - name: atuin
-      url: https://github.com/atuinsh/atuin/releases/latest/download/atuin-installer.sh
-      sh: sh
-      post: ""
-    - name: opencode
-      url: https://opencode.ai/install
-      sh: bash
-      post: ""
-    - name: herdr
-      url: https://herdr.dev/install.sh
-      sh: sh
-      post: ""
-    - name: lazydocker
-      url: https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh
-      sh: bash
-      post: ""
-    - name: rustup
-      url: https://sh.rustup.rs
-      sh: sh -s -- -y --no-modify-path
-      post: rustup component add rustfmt clippy rust-analyzer
-    - name: volta
-      url: https://get.volta.sh
-      sh: bash
-      post: volta install node && volta install @earendil-works/pi-coding-agent
-    - name: uv
-      url: https://astral.sh/uv/install.sh
-      sh: sh
-      post: uv python install && uv tool install ruff
-    - name: dbt
-      url: https://public.cdn.getdbt.com/fs/install/install.sh
-      sh: sh -s -- --update
-      post: ""
+  dev:
+    curlInstallers:
+      - name: starship
+        url: https://starship.rs/install.sh
+        sh: sh -s -- --yes
+        post: ""
+      - name: atuin
+        url: https://github.com/atuinsh/atuin/releases/latest/download/atuin-installer.sh
+        sh: sh
+        post: ""
+      - name: opencode
+        url: https://opencode.ai/install
+        sh: bash
+        post: ""
+      - name: herdr
+        url: https://herdr.dev/install.sh
+        sh: sh
+        post: ""
+      - name: lazydocker
+        url: https://raw.githubusercontent.com/jesseduffield/lazydocker/master/scripts/install_update_linux.sh
+        sh: bash
+        post: ""
+      - name: rustup
+        url: https://sh.rustup.rs
+        sh: sh -s -- -y --no-modify-path
+        post: rustup component add rustfmt clippy rust-analyzer
+      - name: volta
+        url: https://get.volta.sh
+        sh: bash
+        post: volta install node && volta install @earendil-works/pi-coding-agent
+      - name: uv
+        url: https://astral.sh/uv/install.sh
+        sh: sh
+        post: uv python install && uv tool install ruff
+      - name: dbt
+        url: https://public.cdn.getdbt.com/fs/install/install.sh
+        sh: sh -s -- --update
+        post: ""
+  desktop:
+    curlInstallers:
+    voltaTools:
+      - name: screenpipe
+        tool: screenpipe@latest
