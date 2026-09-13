@@ -88,3 +88,14 @@ arch:
     nordvpn:
       aur:
         - nordvpn-bin
+    # Steam. Needs the multilib repo (32-bit libs) — the desktop script
+    # uncomments [multilib] before installing. vulkan-radeon + its lib32
+    # twin are installed explicitly so pacman picks RADV for the
+    # lib32-vulkan-driver provider instead of lib32-nvidia-utils
+    # (alphabetical first-install pick, breaks AMD Vulkan).
+    gaming:
+      pacman:
+        - steam
+        - lib32-mesa
+        - vulkan-radeon
+        - lib32-vulkan-radeon

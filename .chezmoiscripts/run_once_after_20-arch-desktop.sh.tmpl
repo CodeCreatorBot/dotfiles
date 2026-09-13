@@ -109,6 +109,11 @@ fi
 if [ ${#VOLTA_TOOLS[@]} -gt 0 ]; then
 	echo "  volta:   ${VOLTA_TOOLS[*]}"
 fi
+{{ if index . "gaming" }}
+if ! grep -qE '^\[multilib\]' /etc/pacman.conf; then
+	echo "  multilib: will enable [multilib] in /etc/pacman.conf (steam 32-bit)"
+fi
+{{ end }}
 echo
 read -rp "Install the above? [y/N] " yn
 case "$yn" in
@@ -118,6 +123,15 @@ case "$yn" in
 		exit 0
 		;;
 esac
+
+# ── multilib (steam 32-bit libs; must precede the pacman transaction) ────
+
+{{ if index . "gaming" }}
+if ! grep -qE '^\[multilib\]' /etc/pacman.conf; then
+	echo "==> multilib: enabling [multilib] in /etc/pacman.conf"
+	sudo sed -i '/^#\[multilib\]$/,/^#Include = \/etc\/pacman.d\/mirrorlist$/s/^#//' /etc/pacman.conf
+fi
+{{ end }}
 
 # ── pacman (full upgrade — a plain -Sy partial upgrade can resolve
 #    libav* deps against stale packages and fail the transaction) ─────────
