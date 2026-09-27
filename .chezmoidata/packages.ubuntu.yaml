@@ -10,6 +10,7 @@ ubuntu:
       - fd-find
       - bat
       - lazygit
+      - gh
       - ghostty
       - docker.io
       - docker-compose

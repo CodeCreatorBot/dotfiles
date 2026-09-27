@@ -10,6 +10,7 @@ fedora:
       - ripgrep
       - fd-find
       - bat
+      - gh
       - tmux
       - docker
       - docker-compose

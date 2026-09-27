@@ -54,6 +54,10 @@
 	keepBackup = false
 [mergetool "diffview"]
 	cmd = nvim -f -c "DiffviewOpen"
+# Bridge gh's stored auth to git over HTTPS (same line `gh auth setup-git`
+# writes). Host-scoped to github.com — other hosts keep their own helpers.
+[credential "https://github.com"]
+	helper = !gh auth git-credential
 {{ if ne (.env | default "dev") "work-dev" }}
 [user]
 	name = CodeCreatorBot

@@ -19,6 +19,7 @@ arch:
       - fd
       - bat
       - lazygit
+      - github-cli
       - ghostty
       - docker
       - docker-compose
