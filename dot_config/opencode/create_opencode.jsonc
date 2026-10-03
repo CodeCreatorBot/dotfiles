@@ -18,6 +18,11 @@
     "todowrite": "allow",
     "gh_grep_*": "allow",
     "open-websearch_*": "allow",
+    "task": {
+      "*": "ask",
+      "general": "allow",
+      "explore": "allow"
+    },
     "read": {
       "*": "allow",
       "*.env": "deny",
