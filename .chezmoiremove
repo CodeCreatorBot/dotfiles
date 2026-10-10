@@ -21,3 +21,8 @@
 .config/noctalia
 .config/systemd/user/dunst.service
 .config/systemd/user/graphical-session.target.wants/elephant.service
+
+# Research subagent retired (managed dot_config/opencode/agents file
+# deleted from source; global gh_grep/open-websearch MCP servers remain
+# configured for primary agents).
+.config/opencode/agents/research.md

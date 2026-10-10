@@ -407,22 +407,23 @@
   },
 
   "mcp": {
-    "gh_grep": {
-      "type": "remote",
-      "url": "https://mcp.grep.app",
-      "enabled": true
-    },
-    // Open-source multi-engine web search (duckduckgo/bing/brave/...) — the
-    // open replacement for the closed-source exa MCP. Uses npx at startup.
-    "open-websearch": {
-      "type": "stdio",
-      "command": "npx",
-      "args": ["-y", "open-websearch@latest"],
-      "env": {
-        "MODE": "stdio",
-        "DEFAULT_SEARCH_ENGINE": "duckduckgo"
+    "servers": {
+      "gh_grep": {
+        "type": "remote",
+        "url": "https://mcp.grep.app"
       },
-      "enabled": true
+      // Open-source multi-engine web search (duckduckgo/bing/brave/...) — the
+      // open replacement for the closed-source exa MCP. Uses npx at startup.
+      // V2 native shape: mcp.servers.<name>, local `command` array, and
+      // `environment` (not `env`); no `enabled` (servers connect by default).
+      "open-websearch": {
+        "type": "local",
+        "command": ["npx", "-y", "open-websearch@latest"],
+        "environment": {
+          "MODE": "stdio",
+          "DEFAULT_SEARCH_ENGINE": "duckduckgo"
+        }
+      }
     }
   },
 
