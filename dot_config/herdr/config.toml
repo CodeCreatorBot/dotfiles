@@ -13,6 +13,16 @@ switch_workspace = "alt+1..9"
 previous_agent = "alt+shift+["
 next_agent = "alt+shift+]"
 
+# Cycles workspaces across Local + online machines in sidebar order; crossing
+# an endpoint switches the machine, wrapping around. Falls back to local-only
+# cycling when no machine is online.
+previous_workspace = "alt+ctrl+["
+next_workspace = "alt+ctrl+]"
+
+# Sidebar picker: up/down highlights across machines, Enter switches
+# (cross-machine highlighting needs herdr >= 0.9.1; on 0.9.0 it stays local).
+workspace_picker = ["prefix+w", "alt+shift+w"]
+
 [ui]
 mouse_capture = false
 
