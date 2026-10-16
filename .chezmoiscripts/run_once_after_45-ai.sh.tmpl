@@ -1,0 +1,115 @@
+#!/usr/bin/env bash
+# Local AI stack (run_once_after_45) — env=desktop + linux + ai + XDNA2 NPU.
+#
+# Installs the NPU runtime (xrt + fastflowlm + lemonade-server from
+# packages.arch.yaml, switch-gated) and boots the vendor lemond system unit.
+# screenpipe comes from the toolchain (packages.toolchains.yaml, npm) before
+# dotfiles, never here. Inference stays on the NPU (qwen3.5-4b-FLM +
+# whisper-v3-turbo-FLM + embed-gemma-300m-FLM, loaded lazily on first use).
+#
+# Toggling `ai` in chezmoi.toml re-renders this script → new checksum →
+# re-prompt (AGENTS.md rule). Force quirk: `lemonade pull` is idempotent.
+{{ $ai := false }}{{ if hasKey . "ai" }}{{ $ai = .ai }}{{ end }}
+{{- if or (ne (.env | default "dev") "desktop") (ne .chezmoi.os "linux") (not $ai) }}
+echo "Skip: needs env=desktop + linux + ai"
+exit 0
+{{- else }}
+set -eu
+[ -f /etc/arch-release ] || { echo "Skip: not Arch"; exit 0; }
+
+# hardware gate: XDNA2 NPU present?
+[ -e /dev/accel/accel0 ] || { echo "Skip: no NPU (/dev/accel/accel0)"; exit 0; }
+
+# screenpipe from toolchain must already be on PATH
+if ! command -v screenpipe >/dev/null 2>&1; then
+	echo "Skip: screenpipe not on PATH — run the toolchain install first (run_once_before_10-*)"
+	exit 1
+fi
+
+# ── collect packages (switch-gated) ─────────────────────────────────────
+
+PKG_PACMAN=({{ range .arch.desktop.ai.pacman }}"{{ . }}" {{ end }})
+
+# confirm the packages landed (run_once_after_20-arch-desktop installs them)
+missing=()
+for pkg in "${PKG_PACMAN[@]}"; do
+	pacman -Qq "$pkg" >/dev/null 2>&1 || missing+=("$pkg")
+done
+if ((${#missing[@]})); then
+	echo "ERROR: ai packages missing: ${missing[*]}"
+	echo "       run run_once_after_20-arch-desktop first"
+	exit 1
+fi
+
+# ── confirmation ────────────────────────────────────────────────────────
+
+echo
+echo "==> Local AI stack (env={{ .env }})"
+echo
+echo "  models: qwen3.5-4b-FLM + whisper-v3-turbo-FLM + embed-gemma-300m-FLM (~6.5GB)"
+echo
+read -rp "Install the above? [y/N] " yn
+case "$yn" in
+	[Yy]*) ;;
+	*)
+		echo "Aborted."
+		exit 0
+		;;
+esac
+
+# ── NPU runtime ─────────────────────────────────────────────────────────
+
+
+# lemond (vendor system unit) — the only unit that can raise memlock
+# (user units inherit the 8MB hard limit and FLM refuses to run).
+sudo systemctl enable --now lemond.service
+
+echo "==> waiting for lemond on 127.0.0.1:13305"
+wait_lemond() {
+	for i in $(seq 1 60); do
+		if curl -fsS http://127.0.0.1:13305/v1/models >/dev/null 2>&1; then
+			return 0
+		fi
+		[ "$i" -eq 60 ] && { echo "ERROR: lemond not up after 60s"; exit 1; }
+		sleep 1
+	done
+}
+wait_lemond
+
+# lemond must use the system flm (pacman fastflowlm) for its NPU model
+# discovery; with prefer_system=false it only looks for a lemonade-managed
+# install, finds none, and registers zero -FLM models. Restart to rebuild
+# the model cache with discovery enabled.
+lemonade config set flm.prefer_system=true
+sudo systemctl restart lemond.service
+wait_lemond
+
+# NPU validation under the vendor unit's own limits (memlock etc.)
+echo "==> flm validate"
+sudo systemd-run --pipe -p User=lemonade -p AmbientCapabilities=CAP_SYS_RESOURCE \
+	-p LimitMEMLOCK=infinity flm validate || { echo "ERROR: flm validate failed"; exit 1; }
+
+# ── models (lazy: pulled now, loaded on first request) ──────────────────
+
+for model in qwen3.5-4b-FLM whisper-v3-turbo-FLM embed-gemma-300m-FLM; do
+	sudo -u lemonade lemonade pull "$model"
+done
+
+# ── vault + state dirs ──────────────────────────────────────────────────
+
+VAULT="$HOME/obsidian/{{ .chezmoi.hostname }}-ai-notes"
+mkdir -p "$VAULT/Journal/Daily" "$VAULT/Journal/Recordings" "$VAULT/Journal/Weekly"
+mkdir -p "$HOME/.local/state/ai/calls"
+
+# ── user services + timers ──────────────────────────────────────────────
+
+systemctl --user daemon-reload
+systemctl --user enable --now screenpipe.service
+# systemctl --user enable --now ai-index.service
+# systemctl --user enable --now ai-journal-daily.timer ai-journal-weekly.timer
+# ai-record.service stays DISABLED — it is a manual toggle (ai ctl record on).
+
+echo "==> done. Vault: $VAULT"
+echo "    ai ctl status        # stack health"
+echo "    ai ctl record on     # start a session recording (tagged)"
+{{- end }}

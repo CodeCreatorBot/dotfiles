@@ -11,7 +11,7 @@
 # Prints are per-user secrets — never automated. The caelestia lock screen
 # picks the reader up natively once a print is enrolled (lock.enableFprint
 # defaults to true).
-{{- if or (ne (.env | default "dev") "desktop") (ne .chezmoi.os "linux") (not (.fprint | default false)) }}
+{{- if or (ne (.env | default "dev") "desktop") (ne .chezmoi.os "linux") (not (index . "fprint")) }}
 echo "Skip: needs env=desktop + linux + fprint"
 exit 0
 {{- else }}

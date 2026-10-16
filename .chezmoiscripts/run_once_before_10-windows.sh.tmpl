@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # Windows — winget work tooling (run once, before dotfiles).
-# Package data: .chezmoidata/packages.windows.yaml.
+# Package data: .chezmoidata/packages.windows.yaml (windows.work-dev.winget).
+# Shape: os.env.[flag].installer.
 # Gate: env = work-dev AND native Windows (WSL is Linux).
 {{- if or (ne (.env | default "dev") "work-dev") (ne .chezmoi.os "windows") }}
 echo "Skip: env=work-dev + Windows only"
@@ -10,7 +11,7 @@ set -eu
 
 # ── package list ────────────────────────────────────────────────────────
 
-PKG_WINGET=({{ range .windows.winget }}"{{ . }}" {{ end }})
+PKG_WINGET=({{ range index .windows "work-dev" "winget" }}"{{ . }}" {{ end }})
 
 # ── confirmation ────────────────────────────────────────────────────────
 

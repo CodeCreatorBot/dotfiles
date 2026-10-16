@@ -2,6 +2,10 @@
 
 export SHELL=/bin/bash
 
+# default editor — opencode /editor + /export read $VISUAL then $EDITOR
+export VISUAL=nvim
+export EDITOR=nvim
+
 # volta (node)
 VOLTA_PATH="$HOME/.volta/bin"
 if [ -d "$VOLTA_PATH" ]; then

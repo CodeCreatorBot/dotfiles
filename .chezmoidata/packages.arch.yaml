@@ -1,24 +1,28 @@
 # Arch Linux packages — consumed by run_once_before_10-arch.sh.tmpl
 # (dev + toolchains) and run_once_after_20-arch-desktop.sh.tmpl (desktop).
 #
-# Desktop packages are grouped BY SWITCH NAME. The switch VALUES live in
-# chezmoi.toml [data] (single source of truth — they also gate file
-# deployment in .chezmoiignore). This file only lists what each switch
-# installs.
+# Shape — os.env.[flag].installer = [packages] (flag optional):
+#   dev     → always-installed base, no flag: arch.dev.pacman
+#   desktop → switch-gated: arch.desktop.<flag>.<installer>
+# The flag VALUES live in chezmoi.toml [data] (single source of truth —
+# they also gate file deployment in .chezmoiignore). This file only lists
+# what each flag installs.
 arch:
   dev:
-    - neovim
-    - eza
-    - zoxide
-    - fzf
-    - starship
-    - ripgrep
-    - fd
-    - bat
-    - lazygit
-    - ghostty
-    - docker
-    - docker-compose
+    pacman:
+      - neovim
+      - eza
+      - zoxide
+      - fzf
+      - starship
+      - ripgrep
+      - fd
+      - bat
+      - lazygit
+      - github-cli
+      - ghostty
+      - docker
+      - docker-compose
 
   desktop:
     # Caelestia Shell (Quickshell-based desktop shell on top of Hyprland).
@@ -58,10 +62,41 @@ arch:
     fprint:
       pacman:
         - fprintd
-    flatpak:
-      - com.stremio.Stremio
-      - com.github.geigi.cozy
-    aurExtras:
-      - bitwarden-bin
-      - grayjay-bin
-      - nordvpn-bin
+    # Local AI stack (NPU-only) — inference stays on the XDNA2 NPU via
+    # lemonade-server + FastFlowLM; no ollama/GPU inference by design.
+    # (screenpipe recording is a volta tool: toolchains.desktop.voltaTools
+    # in packages.toolchains.yaml, installed by run_once_after_20-arch-desktop;
+    # openblas is a runtime dep of the npm cli-linux-x64 binary).
+    ai:
+      pacman:
+        - xrt
+        - xrt-plugin-amdxdna
+        - fastflowlm
+        - lemonade-server
+        - openblas
+    stremio:
+      flatpak:
+        - com.stremio.Stremio
+    audiobooks:
+      flatpak:
+        - com.github.geigi.cozy
+    bitwarden:
+      aur:
+        - bitwarden-bin
+    grayjay:
+      aur:
+        - grayjay-bin
+    nordvpn:
+      aur:
+        - nordvpn-bin
+    # Steam. Needs the multilib repo (32-bit libs) — the desktop script
+    # uncomments [multilib] before installing. vulkan-radeon + its lib32
+    # twin are installed explicitly so pacman picks RADV for the
+    # lib32-vulkan-driver provider instead of lib32-nvidia-utils
+    # (alphabetical first-install pick, breaks AMD Vulkan).
+    gaming:
+      pacman:
+        - steam
+        - lib32-mesa
+        - vulkan-radeon
+        - lib32-vulkan-radeon
